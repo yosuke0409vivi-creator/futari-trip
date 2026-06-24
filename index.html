@@ -3,412 +3,418 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
-<meta name="theme-color" content="#ff7a8a" />
-<title>ふたり旅プラン</title>
+<meta name="theme-color" content="#fbf6f3" />
+<title>ふたり旅のしおり</title>
 
-<!-- iPhone「ホーム画面に追加」用 -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <meta name="apple-mobile-web-app-title" content="ふたり旅" />
 <link rel="apple-touch-icon" href="icon-180.png" />
 <link rel="manifest" href="manifest.json" />
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Shippori+Mincho:wght@500;600;700&display=swap" rel="stylesheet">
+
 <style>
   :root{
-    --pink:#ff7a8a; --pink-d:#f25c70; --teal:#16b3a6; --teal-d:#0e8f85;
-    --bg:#fbf7f4; --card:#ffffff; --ink:#33303a; --sub:#8d8794;
-    --line:#eee3dc; --soft:#fff2ef; --soft2:#eafaf8;
-    --shadow:0 6px 22px rgba(120,90,90,.10);
-    --r:16px;
+    --bg:#fbf6f3; --paper:#ffffff; --ink:#403a40; --sub:#a3979b;
+    --rose:#d98a98; --rose-d:#c06a7c; --rose-soft:#f7e9eb; --rose-line:#f0d9dd;
+    --gold:#c4a76b; --line:#efe3de; --cream:#f5ece7;
+    --cat:#70635a;
+    --shadow:0 10px 34px rgba(150,110,110,.10);
+    --shadow-s:0 4px 16px rgba(150,110,110,.08);
+    --serif:'Shippori Mincho','Hiragino Mincho ProN',serif;
+    --display:'Cormorant Garamond','Shippori Mincho',serif;
+    --r:18px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
-    background:var(--bg); color:var(--ink); line-height:1.5;
+    background:var(--bg); color:var(--ink); line-height:1.62; letter-spacing:.01em;
     padding-bottom:env(safe-area-inset-bottom);
   }
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-  input,select,textarea{font-family:inherit;font-size:16px}
+  input,select,textarea{font-family:inherit;font-size:16px;color:var(--ink)}
+  h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:.02em}
 
   /* ===== ヘッダー ===== */
   header{
-    background:linear-gradient(135deg,var(--pink),#ff9e8a);
-    color:#fff; padding:calc(env(safe-area-inset-top) + 14px) 16px 16px;
-    box-shadow:var(--shadow); position:sticky; top:0; z-index:30;
+    background:rgba(251,246,243,.86); backdrop-filter:saturate(1.4) blur(10px);
+    padding:calc(env(safe-area-inset-top) + 12px) 18px 12px;
+    position:sticky; top:0; z-index:30; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:11px;
   }
-  .h-top{display:flex;align-items:center;gap:10px}
-  .h-top h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.04em;flex:1}
-  .h-top .icon-btn{font-size:20px;width:38px;height:38px;border-radius:50%;
-    background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center}
-  .trip-pick{margin-top:12px;display:flex;align-items:center;gap:8px}
-  .trip-pick select{
-    flex:1;background:rgba(255,255,255,.92);border:none;border-radius:12px;
-    padding:10px 12px;font-weight:700;color:var(--ink)
-  }
-  .countdown{
-    margin-top:12px;background:rgba(255,255,255,.16);border-radius:14px;
-    padding:10px 14px;display:flex;align-items:baseline;gap:8px;backdrop-filter:blur(4px)
-  }
-  .countdown .big{font-size:30px;font-weight:800;line-height:1}
-  .countdown .lbl{font-size:13px;opacity:.92}
-  .countdown .date{margin-left:auto;font-size:12px;opacity:.85;text-align:right}
+  header .cat{width:34px;height:34px;flex:0 0 auto}
+  header .brand{flex:1;min-width:0}
+  header .brand .nm{font-family:var(--serif);font-weight:700;font-size:16px;line-height:1.1}
+  header .brand .sub{font-size:10.5px;color:var(--sub);letter-spacing:.18em;text-transform:uppercase}
+  header .ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-size:17px;color:var(--rose-d);background:var(--paper);box-shadow:var(--shadow-s)}
 
-  /* ===== タブ ===== */
-  nav.tabs{
-    display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:var(--card);
-    position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);
-    -webkit-overflow-scrolling:touch;scrollbar-width:none
-  }
-  nav.tabs::-webkit-scrollbar{display:none}
-  nav.tabs button{
-    white-space:nowrap;padding:8px 14px;border-radius:999px;font-size:14px;font-weight:600;
-    color:var(--sub);background:var(--bg);flex:0 0 auto
-  }
-  nav.tabs button.on{background:var(--pink);color:#fff;box-shadow:0 3px 10px rgba(242,92,112,.35)}
+  /* ===== チャプターナビ ===== */
+  nav.chapters{display:flex;gap:7px;overflow-x:auto;padding:11px 16px;background:transparent;
+    position:sticky;top:calc(env(safe-area-inset-top) + 59px);z-index:25;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  nav.chapters::-webkit-scrollbar{display:none}
+  nav.chapters button{white-space:nowrap;padding:8px 16px;border-radius:999px;font-family:var(--serif);
+    font-size:14px;font-weight:600;color:var(--sub);background:var(--paper);flex:0 0 auto;
+    border:1px solid var(--line);transition:.18s}
+  nav.chapters button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  nav.chapters button.ai{color:var(--rose-d);border-color:var(--rose-line)}
+  nav.chapters button.ai.on{background:var(--rose);color:#fff;border-color:var(--rose)}
 
-  /* ===== コンテンツ ===== */
-  main{padding:14px 14px 96px;max-width:680px;margin:0 auto}
-  .sec-title{display:flex;align-items:center;gap:8px;margin:4px 2px 12px}
-  .sec-title h2{font-size:17px;margin:0;font-weight:700}
-  .sec-title .hint{font-size:12px;color:var(--sub);margin-left:auto}
+  main{padding:8px 16px 110px;max-width:680px;margin:0 auto}
 
-  .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);
-    padding:14px;margin-bottom:12px;border:1px solid var(--line)}
+  /* ===== 表紙 ===== */
+  .cover{background:var(--paper);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;
+    border:1px solid var(--line);margin:8px 0 16px;position:relative}
+  .cover .band{padding:30px 26px 26px;text-align:center;position:relative;
+    background:linear-gradient(180deg,#fff 0%,var(--rose-soft) 100%)}
+  .cover .kicker{font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--rose-d);margin-bottom:14px}
+  .cover h1{font-size:30px;margin:0 0 8px;line-height:1.28}
+  .cover .dest{font-family:var(--serif);font-size:15px;color:var(--ink)}
+  .cover .dates{font-family:var(--display);font-size:19px;color:var(--sub);font-style:italic;margin-top:2px}
+  .cover .catwrap{margin:18px auto 4px;width:118px;height:118px}
+  .cover .cd{display:flex;align-items:baseline;justify-content:center;gap:9px;margin-top:6px}
+  .cover .cd .n{font-family:var(--display);font-size:52px;font-weight:600;color:var(--rose-d);line-height:.9}
+  .cover .cd .l{font-family:var(--serif);font-size:14px;color:var(--ink)}
+  .rule{width:42px;height:1px;background:var(--gold);margin:16px auto;opacity:.7}
+  .summary{display:flex;justify-content:center;gap:0;padding:18px 10px 22px;flex-wrap:wrap}
+  .summary .s{flex:1;min-width:64px;text-align:center;padding:4px 6px;position:relative}
+  .summary .s+.s::before{content:"";position:absolute;left:0;top:18%;height:64%;width:1px;background:var(--line)}
+  .summary .s .n{font-family:var(--display);font-size:26px;font-weight:600;color:var(--ink)}
+  .summary .s .l{font-size:11px;color:var(--sub);letter-spacing:.04em}
+
+  .cover-actions{padding:0 22px 24px;display:flex;flex-direction:column;gap:10px}
+  .btn-ai{display:flex;align-items:center;justify-content:center;gap:9px;padding:15px;border-radius:14px;
+    background:linear-gradient(120deg,var(--rose),#e6a8a0);color:#fff;font-family:var(--serif);font-weight:600;
+    font-size:15px;box-shadow:0 8px 22px rgba(192,106,124,.30)}
+  .btn-ai img{width:24px;height:24px}
+  .cover-meta{display:flex;gap:10px}
+  .cover-meta select{flex:1;padding:11px 12px;border-radius:12px;border:1px solid var(--line);
+    background:var(--cream);font-family:var(--serif);font-weight:600}
+  .cover-meta .mini{width:46px;border-radius:12px;background:var(--cream);border:1px solid var(--line);
+    font-size:18px;color:var(--rose-d)}
+
+  /* ===== セクション見出し ===== */
+  .chap-head{text-align:center;margin:18px 0 18px}
+  .chap-head .idx{font-family:var(--display);font-style:italic;font-size:14px;color:var(--gold);letter-spacing:.1em}
+  .chap-head h2{font-size:23px;margin:2px 0 0}
+  .chap-head p{font-size:12.5px;color:var(--sub);margin:6px 0 0}
+
+  /* ===== カード ===== */
+  .card{background:var(--paper);border-radius:var(--r);box-shadow:var(--shadow-s);
+    padding:16px 17px;margin-bottom:13px;border:1px solid var(--line);position:relative;transition:.15s}
+  .card:active{transform:scale(.992)}
   .card .row1{display:flex;align-items:flex-start;gap:10px}
-  .card .ttl{font-weight:700;font-size:15px;flex:1}
-  .card .meta{font-size:13px;color:var(--sub);margin-top:3px}
-  .card .note{font-size:14px;margin-top:8px;white-space:pre-wrap;color:#56505c}
-  .card a.link{font-size:13px;color:var(--teal-d);font-weight:600;text-decoration:none;
-    display:inline-flex;align-items:center;gap:4px;margin-top:8px}
-  .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;
-    background:var(--soft2);color:var(--teal-d);margin-right:6px}
-  .tag.pink{background:var(--soft);color:var(--pink-d)}
+  .card .ttl{font-family:var(--serif);font-weight:600;font-size:16px;flex:1;line-height:1.4}
+  .card .meta{font-size:13px;color:var(--sub);margin-top:5px;display:flex;align-items:center;gap:5px}
+  .card .note{font-size:14px;margin-top:9px;white-space:pre-wrap;color:#6b636a;line-height:1.6}
+  .actions{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+  .chip-link{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;
+    padding:7px 13px;border-radius:999px;text-decoration:none;border:1px solid var(--line);color:var(--ink);background:var(--cream)}
+  .chip-link.map{color:var(--rose-d);border-color:var(--rose-line);background:var(--rose-soft)}
+  .tag{display:inline-block;font-family:var(--serif);font-size:11px;font-weight:700;padding:3px 11px;border-radius:999px;
+    background:var(--cream);color:var(--gold);margin-right:7px;letter-spacing:.04em}
+  .tag.rose{background:var(--rose-soft);color:var(--rose-d)}
+  .mini-btn{font-size:14px;color:var(--sub);padding:5px;border-radius:8px;line-height:1}
 
-  .empty{text-align:center;color:var(--sub);padding:40px 20px;font-size:14px}
-  .empty .em{font-size:40px;display:block;margin-bottom:10px}
+  .empty{text-align:center;color:var(--sub);padding:34px 20px}
+  .empty .catwrap{width:96px;height:96px;margin:0 auto 12px;opacity:.92}
+  .empty b{font-family:var(--serif);font-size:15px;color:var(--ink);display:block;margin-bottom:5px}
+  .empty span{font-size:13px}
 
-  /* like ボタン */
-  .likes{display:flex;gap:8px;margin-top:10px}
-  .like-btn{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;
-    padding:6px 11px;border-radius:999px;background:var(--bg);color:var(--sub);border:1px solid var(--line)}
-  .like-btn.on{background:var(--soft);color:var(--pink-d);border-color:#ffd2d8}
+  /* like / 投票 */
+  .likes{display:flex;gap:8px;margin-top:12px}
+  .like-btn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:7px 13px;border-radius:999px;
+    background:var(--cream);color:var(--sub);border:1px solid var(--line);font-family:var(--serif)}
+  .like-btn.on{background:var(--rose-soft);color:var(--rose-d);border-color:var(--rose-line)}
 
-  .mini-btn{font-size:12px;color:var(--sub);padding:6px;border-radius:8px}
-  .mini-btn.del:active{color:var(--pink-d)}
-
-  /* チェックリスト行 */
-  .check-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);
-    border-radius:12px;margin-bottom:8px;box-shadow:var(--shadow);border:1px solid var(--line)}
-  .check-row .box{width:24px;height:24px;border-radius:7px;border:2px solid #d8cfca;flex:0 0 auto;
-    display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff}
-  .check-row.done .box{background:var(--teal);border-color:var(--teal)}
+  /* チェックリスト */
+  .check-row{display:flex;align-items:center;gap:13px;padding:14px 16px;background:var(--paper);
+    border-radius:14px;margin-bottom:9px;box-shadow:var(--shadow-s);border:1px solid var(--line)}
+  .check-row .box{width:25px;height:25px;border-radius:8px;border:1.8px solid #ddd0ca;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;transition:.15s}
+  .check-row.done .box{background:var(--gold);border-color:var(--gold)}
   .check-row.done .nm{text-decoration:line-through;color:var(--sub)}
   .check-row .nm{flex:1;font-size:15px}
-  .group-h{font-size:12px;font-weight:800;color:var(--sub);letter-spacing:.06em;
-    margin:16px 4px 8px;text-transform:uppercase}
+  .group-h{font-family:var(--serif);font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.14em;
+    margin:20px 4px 9px;text-transform:uppercase}
+  .group-h:first-child{margin-top:4px}
 
-  /* 予算サマリ */
-  .summary{display:flex;gap:10px;margin-bottom:14px}
-  .summary .box{flex:1;background:var(--card);border-radius:14px;padding:12px;text-align:center;
-    box-shadow:var(--shadow);border:1px solid var(--line)}
-  .summary .box .n{font-size:20px;font-weight:800}
-  .summary .box .l{font-size:11px;color:var(--sub);margin-top:2px}
-  .settle{background:linear-gradient(135deg,var(--teal),#3fd1c4);color:#fff;border-radius:14px;
-    padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow);font-weight:700}
-  .settle small{display:block;font-weight:500;opacity:.9;font-size:12px;margin-bottom:4px}
+  /* 予算 */
+  .ledger{background:var(--paper);border-radius:var(--r);box-shadow:var(--shadow-s);border:1px solid var(--line);
+    padding:20px;margin-bottom:14px;text-align:center}
+  .ledger .total{font-family:var(--display);font-size:40px;font-weight:600;color:var(--ink);line-height:1}
+  .ledger .total small{font-family:var(--serif);font-size:14px;color:var(--sub);font-weight:400}
+  .ledger .split{display:flex;margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+  .ledger .split .p{flex:1}
+  .ledger .split .p .nm{font-family:var(--serif);font-size:13px;color:var(--sub)}
+  .ledger .split .p .v{font-family:var(--display);font-size:22px;font-weight:600}
+  .settle{background:linear-gradient(120deg,var(--gold),#d8bd86);color:#fff;border-radius:var(--r);
+    padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow-s);text-align:center;font-family:var(--serif)}
+  .settle small{display:block;opacity:.92;font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:5px}
+  .settle b{font-size:18px}
+
+  /* ===== AIコンシェルジュ ===== */
+  .ai-intro{background:var(--paper);border-radius:24px;border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:24px 22px;text-align:center;margin-bottom:14px}
+  .ai-intro .catwrap{width:96px;height:96px;margin:0 auto 10px}
+  .ai-intro h2{font-size:22px;margin:0 0 6px}
+  .ai-intro p{font-size:13px;color:var(--sub);margin:0 0 4px}
+  .ai-field{margin-bottom:12px}
+  .ai-field textarea{width:100%;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--paper);min-height:80px;resize:vertical}
+  .ai-quick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .ai-quick button{font-size:12.5px;font-family:var(--serif);padding:8px 14px;border-radius:999px;
+    background:var(--rose-soft);color:var(--rose-d);border:1px solid var(--rose-line)}
+  .ai-bubble{border-radius:16px;padding:14px 16px;margin-bottom:11px;font-size:14px;line-height:1.7;white-space:pre-wrap}
+  .ai-bubble.me{background:var(--ink);color:#fff;margin-left:36px;border-bottom-right-radius:5px}
+  .ai-bubble.cat{background:var(--paper);border:1px solid var(--line);box-shadow:var(--shadow-s);margin-right:18px;border-bottom-left-radius:5px}
+  .ai-bubble.cat .who{font-family:var(--serif);font-size:11px;color:var(--rose-d);letter-spacing:.08em;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+  .ai-bubble.cat .who img{width:18px;height:18px}
+  .plan-day{background:var(--paper);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-s);padding:14px 16px;margin-bottom:10px}
+  .plan-day .dh{font-family:var(--serif);font-weight:700;color:var(--gold);font-size:13px;letter-spacing:.06em;margin-bottom:8px}
+  .plan-day .pi{font-size:13.5px;padding:5px 0;border-top:1px dashed var(--line)}
+  .plan-day .pi:first-of-type{border-top:none}
+  .plan-day .pi .t{font-family:var(--serif);color:var(--rose-d);font-weight:600;margin-right:7px}
+  .spinner{display:inline-block;width:18px;height:18px;border:2.5px solid var(--rose-line);border-top-color:var(--rose);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-3px}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
   /* FAB */
-  .fab{position:fixed;right:18px;bottom:calc(20px + env(safe-area-inset-bottom));
-    width:58px;height:58px;border-radius:50%;background:var(--pink);color:#fff;font-size:30px;
-    display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(242,92,112,.45);z-index:40}
-  .fab:active{transform:scale(.94)}
+  .fab{position:fixed;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));
+    width:60px;height:60px;border-radius:50%;background:var(--ink);color:#fff;font-size:28px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px rgba(64,58,64,.4);z-index:40}
+  .fab:active{transform:scale(.93)}
 
-  /* ===== モーダル ===== */
-  .modal-bg{position:fixed;inset:0;background:rgba(40,30,35,.45);z-index:50;display:none;
-    align-items:flex-end;justify-content:center}
+  /* モーダル */
+  .modal-bg{position:fixed;inset:0;background:rgba(60,48,52,.42);z-index:50;display:none;align-items:flex-end;justify-content:center}
   .modal-bg.show{display:flex}
-  .modal{background:var(--card);width:100%;max-width:520px;border-radius:22px 22px 0 0;
-    padding:20px 18px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow-y:auto;
-    animation:up .25s ease}
-  @keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:translateY(0);opacity:1}}
-  .modal h3{margin:0 0 16px;font-size:18px}
-  .field{margin-bottom:14px}
-  .field label{display:block;font-size:13px;font-weight:700;color:var(--sub);margin-bottom:6px}
-  .field input,.field select,.field textarea{
-    width:100%;padding:12px;border:1.5px solid var(--line);border-radius:11px;background:var(--bg);color:var(--ink)}
-  .field textarea{min-height:80px;resize:vertical}
-  .field .two{display:flex;gap:10px}
-  .field .two>*{flex:1}
-  .modal-actions{display:flex;gap:10px;margin-top:8px}
-  .btn{flex:1;padding:14px;border-radius:12px;font-weight:700;font-size:15px;text-align:center}
-  .btn.primary{background:var(--pink);color:#fff}
-  .btn.ghost{background:var(--bg);color:var(--sub)}
-  .seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-  .seg button{padding:8px 12px;border-radius:10px;background:var(--bg);font-size:13px;font-weight:600;color:var(--sub);border:1.5px solid var(--line)}
-  .seg button.on{background:var(--pink);color:#fff;border-color:var(--pink)}
-
-  /* 同期状態 */
-  .sync-dot{width:9px;height:9px;border-radius:50%;background:#cfc6c0}
-  .sync-dot.on{background:#46d39a;box-shadow:0 0 0 3px rgba(70,211,154,.25)}
-  .sync-dot.err{background:#ffb24d}
-  .note-box{background:var(--soft2);border-radius:12px;padding:12px;font-size:13px;color:var(--teal-d);margin-bottom:14px;line-height:1.6}
+  .modal{background:var(--paper);width:100%;max-width:520px;border-radius:24px 24px 0 0;
+    padding:8px 20px calc(26px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;animation:up .26s ease}
+  @keyframes up{from{transform:translateY(40px);opacity:.5}to{transform:translateY(0);opacity:1}}
+  .modal .grip{width:42px;height:4px;border-radius:99px;background:var(--line);margin:8px auto 14px}
+  .modal h3{margin:0 0 18px;font-size:20px;text-align:center}
+  .field{margin-bottom:15px}
+  .field label{display:block;font-family:var(--serif);font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:12px;background:var(--cream)}
+  .field textarea{min-height:78px;resize:vertical}
+  .field .two{display:flex;gap:10px}.field .two>*{flex:1}
+  .modal-actions{display:flex;gap:10px;margin-top:6px}
+  .btn{flex:1;padding:14px;border-radius:13px;font-family:var(--serif);font-weight:600;font-size:15px;text-align:center}
+  .btn.primary{background:var(--ink);color:#fff}
+  .btn.rose{background:var(--rose);color:#fff}
+  .btn.ghost{background:var(--cream);color:var(--sub)}
+  .seg{display:flex;gap:7px;flex-wrap:wrap}
+  .seg button{padding:9px 13px;border-radius:11px;background:var(--cream);font-size:13px;font-family:var(--serif);font-weight:600;color:var(--sub);border:1px solid var(--line)}
+  .seg button.on{background:var(--rose);color:#fff;border-color:var(--rose)}
+  .note-box{background:var(--rose-soft);border-radius:13px;padding:13px 14px;font-size:12.5px;color:var(--rose-d);margin-bottom:15px;line-height:1.7}
+  .sync-dot{width:9px;height:9px;border-radius:50%;background:#cfc6c0;display:inline-block}
+  .sync-dot.on{background:#7cc6a6}.sync-dot.err{background:#e0b25a}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="h-top">
-    <h1>💕 ふたり旅プラン</h1>
-    <button class="icon-btn" id="btnSync" title="同期">🔗</button>
-    <button class="icon-btn" id="btnSettings" title="設定">⚙️</button>
-  </div>
-  <div class="trip-pick">
-    <select id="tripSelect"></select>
-    <button class="icon-btn" id="btnNewTrip" title="新しい旅行">＋</button>
-  </div>
-  <div class="countdown" id="countdown"></div>
+  <img class="cat" src="neko-face.png" alt="" />
+  <div class="brand"><div class="nm">ふたり旅のしおり</div><div class="sub">Our Little Trip</div></div>
+  <button class="ico" id="btnSync" title="同期">🔗</button>
+  <button class="ico" id="btnSettings" title="設定">⚙️</button>
 </header>
 
-<nav class="tabs" id="tabs"></nav>
+<nav class="chapters" id="chapters"></nav>
 <main id="main"></main>
 
 <button class="fab" id="fab">＋</button>
 
-<div class="modal-bg" id="modalBg">
-  <div class="modal" id="modal"></div>
-</div>
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-/* ============================================================
-   状態管理
-============================================================ */
-const TABS = [
-  { id:'cand',  icon:'📍', label:'候補地' },
-  { id:'plan',  icon:'🗓', label:'しおり' },
-  { id:'wish',  icon:'⭐️', label:'行きたい' },
-  { id:'money', icon:'💰', label:'予算' },
-  { id:'pack',  icon:'🧳', label:'持ち物' },
-  { id:'resv',  icon:'🎫', label:'予約' },
+/* ============================================================ 状態 */
+const CHAPTERS = [
+  { id:'cover', label:'表紙' },
+  { id:'cand',  label:'候補地' },
+  { id:'plan',  label:'しおり' },
+  { id:'wish',  label:'行きたい' },
+  { id:'money', label:'予算' },
+  { id:'pack',  label:'持ち物' },
+  { id:'resv',  label:'予約' },
+  { id:'ai',    label:'✨相談', ai:true },
 ];
+const TYPE_KEY = {cand:'candidates',plan:'itinerary',wish:'wishlist',money:'expenses',pack:'packing',resv:'reservations'};
 const CLIENT_ID = Math.random().toString(36).slice(2);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const CAT_FACE='neko-face.png', CAT_FULL='neko-mascot.png';
 
-let state = loadState();
-let ui = { tab:'cand' };
-let db = null, unsub = null, syncReady = false;
-let saveTimer = null;
+let ui = { chapter:'cover', chat:[] };
+let db=null, unsub=null, syncReady=false, saveTimer=null;
 
 function blankTrip(title){
-  return {
-    id: uid(), title: title||'はじめての旅行', destination:'',
-    startDate:'', endDate:'',
-    candidates:[], itinerary:[], wishlist:[], expenses:[], packing:[], reservations:[]
-  };
+  return { id:uid(), title:title||'はじめての旅行', destination:'', startDate:'', endDate:'',
+    candidates:[], itinerary:[], wishlist:[], expenses:[], packing:[], reservations:[] };
 }
 function defaultState(){
-  const t = blankTrip('はじめての旅行');
-  return {
-    trips:[t], currentTripId:t.id,
-    members:['わたし','パートナー'],
-    me:0,                 // この端末の人 (0/1)
-    pairCode:'',          // 同期コード
-    firebaseConfig:'',    // 貼り付けたJSON文字列
-    updatedAt:0
-  };
+  const t=blankTrip('はじめての旅行');
+  return { trips:[t], currentTripId:t.id, members:['わたし','パートナー'], me:0,
+    pairCode:'', firebaseConfig:'', geminiKey:'', geminiModel:'gemini-2.0-flash', updatedAt:0 };
 }
 function loadState(){
-  try{
-    const raw = localStorage.getItem('futari-trip');
-    if(!raw) return defaultState();
-    const s = JSON.parse(raw);
-    if(!s.trips || !s.trips.length) return defaultState();
-    s.members = s.members || ['わたし','パートナー'];
-    if(typeof s.me!=='number') s.me=0;
+  try{ const s=JSON.parse(localStorage.getItem('futari-trip'));
+    if(!s||!s.trips||!s.trips.length) return defaultState();
+    s.members=s.members||['わたし','パートナー']; if(typeof s.me!=='number') s.me=0;
+    s.geminiModel=s.geminiModel||'gemini-2.0-flash'; s.geminiKey=s.geminiKey||'';
     return s;
   }catch(e){ return defaultState(); }
 }
-function persist(){
-  state.updatedAt = Date.now();
-  localStorage.setItem('futari-trip', JSON.stringify(state));
-  pushToCloud();
-}
+let state = loadState();
+function persist(){ state.updatedAt=Date.now(); localStorage.setItem('futari-trip',JSON.stringify(state)); pushToCloud(); }
 function save(){ persist(); render(); }
+function curTrip(){ return state.trips.find(t=>t.id===state.currentTripId)||state.trips[0]; }
 
-function curTrip(){
-  return state.trips.find(t=>t.id===state.currentTripId) || state.trips[0];
-}
-
-/* ============================================================
-   クラウド同期 (Firebase / 任意)
-============================================================ */
+/* ============================================================ 同期（端末ローカルの鍵は送らない） */
+function cloudPayload(){ const s={...state, geminiKey:'', firebaseConfig:'', pairCode:'', me:0}; return JSON.stringify(s); }
 function initSync(){
-  if(unsub){ unsub(); unsub=null; }
-  syncReady = false; db = null;
-  updateSyncDot();
-  if(!state.firebaseConfig || !state.pairCode) return;
-  let cfg;
-  try{ cfg = JSON.parse(state.firebaseConfig); }
-  catch(e){ updateSyncDot('err'); return; }
+  if(unsub){ unsub(); unsub=null; } syncReady=false; db=null; updateSyncDot();
+  if(!state.firebaseConfig||!state.pairCode) return;
+  let cfg; try{ cfg=JSON.parse(state.firebaseConfig); }catch(e){ updateSyncDot('err'); return; }
   try{
-    const app = initializeApp(cfg, 'futari-'+state.pairCode);
-    db = getFirestore(app);
-    const ref = doc(db, 'pairs', 'trip-'+state.pairCode);
-    unsub = onSnapshot(ref, snap=>{
-      syncReady = true; updateSyncDot('on');
-      const data = snap.data();
-      if(data && data.payload){
-        try{
-          const remote = JSON.parse(data.payload);
-          if(remote.updatedAt > (state.updatedAt||0) && data.by!==CLIENT_ID){
-            const keepMe = state.me, keepCode=state.pairCode, keepCfg=state.firebaseConfig;
-            state = remote;
-            state.me = keepMe; state.pairCode = keepCode; state.firebaseConfig = keepCfg;
-            localStorage.setItem('futari-trip', JSON.stringify(state));
-            render();
-          }
-        }catch(e){}
-      }
-    }, err=>{ updateSyncDot('err'); });
+    const app=initializeApp(cfg,'futari-'+state.pairCode); db=getFirestore(app);
+    const ref=doc(db,'pairs','trip-'+state.pairCode);
+    unsub=onSnapshot(ref, snap=>{
+      syncReady=true; updateSyncDot('on'); const data=snap.data();
+      if(data&&data.payload){ try{ const remote=JSON.parse(data.payload);
+        if(remote.updatedAt>(state.updatedAt||0) && data.by!==CLIENT_ID){
+          const k={me:state.me,pairCode:state.pairCode,firebaseConfig:state.firebaseConfig,geminiKey:state.geminiKey,geminiModel:state.geminiModel};
+          state=remote; Object.assign(state,k);
+          localStorage.setItem('futari-trip',JSON.stringify(state)); render();
+        }}catch(e){} }
+    }, err=>updateSyncDot('err'));
   }catch(e){ updateSyncDot('err'); }
 }
 function pushToCloud(){
-  if(!db || !syncReady) return;
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(async ()=>{
-    try{
-      const ref = doc(db, 'pairs', 'trip-'+state.pairCode);
-      await setDoc(ref, { payload: JSON.stringify(state), by: CLIENT_ID, ts: Date.now() });
-    }catch(e){ updateSyncDot('err'); }
-  }, 600);
+  if(!db||!syncReady) return; clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{ try{
+    await setDoc(doc(db,'pairs','trip-'+state.pairCode), {payload:cloudPayload(),by:CLIENT_ID,ts:Date.now()});
+  }catch(e){ updateSyncDot('err'); } },600);
 }
-function updateSyncDot(s){
-  const btn = document.getElementById('btnSync');
-  if(!state.firebaseConfig || !state.pairCode){ btn.textContent='🔗'; return; }
-  btn.textContent = s==='on' ? '🟢' : s==='err' ? '🟠' : '🔗';
-}
+function updateSyncDot(s){ const b=document.getElementById('btnSync');
+  if(!state.firebaseConfig||!state.pairCode){ b.textContent='🔗'; return; }
+  b.textContent = s==='on'?'🟢':s==='err'?'🟠':'🔗'; }
 
-/* ============================================================
-   描画
-============================================================ */
-function render(){
-  renderHeader();
-  renderTabs();
-  renderMain();
+/* ============================================================ 描画 */
+function render(){ renderChapters(); renderMain(); updateSyncDot(syncReady?'on':undefined); }
+function renderChapters(){
+  document.getElementById('chapters').innerHTML = CHAPTERS.map(c=>
+    `<button data-ch="${c.id}" class="${c.ai?'ai':''} ${ui.chapter===c.id?'on':''}">${c.label}</button>`).join('');
 }
-
-function renderHeader(){
-  // トリップ選択
-  const sel = document.getElementById('tripSelect');
-  sel.innerHTML = state.trips.map(t=>
-    `<option value="${t.id}" ${t.id===state.currentTripId?'selected':''}>${esc(t.title)}</option>`).join('');
-  // カウントダウン
-  const t = curTrip();
-  const cd = document.getElementById('countdown');
-  if(t.startDate){
-    const days = daysUntil(t.startDate);
-    const dateStr = fmtRange(t.startDate, t.endDate);
-    let big, lbl;
-    if(days>0){ big=days; lbl='日後に出発！'; }
-    else if(days===0){ big='当日'; lbl='いってらっしゃい🎉'; }
-    else { big=Math.abs(days); lbl='日前に行った旅'; }
-    cd.style.display='flex';
-    cd.innerHTML = `<span class="big">${big}</span><span class="lbl">${lbl}</span>
-      <span class="date">${t.destination?esc(t.destination)+'<br>':''}${dateStr}</span>`;
-  } else {
-    cd.style.display='flex';
-    cd.innerHTML = `<span class="lbl">📅 行き先と日程を設定すると、出発までカウントダウンが出ます</span>`;
-  }
-}
-
-function renderTabs(){
-  const nav = document.getElementById('tabs');
-  nav.innerHTML = TABS.map(t=>
-    `<button data-tab="${t.id}" class="${ui.tab===t.id?'on':''}">${t.icon} ${t.label}</button>`).join('');
-}
-
 function renderMain(){
-  const m = document.getElementById('main');
-  const t = curTrip();
-  const R = { cand:renderCand, plan:renderPlan, wish:renderWish, money:renderMoney, pack:renderPack, resv:renderResv };
-  m.innerHTML = R[ui.tab](t);
-  // 同期ボタンの色更新
-  updateSyncDot(syncReady?'on':undefined);
+  const t=curTrip();
+  const R={cover:renderCover,cand:renderCand,plan:renderPlan,wish:renderWish,money:renderMoney,pack:renderPack,resv:renderResv,ai:renderAI};
+  document.getElementById('main').innerHTML=R[ui.chapter](t);
+  document.getElementById('fab').style.display = (ui.chapter==='cover'||ui.chapter==='ai')?'none':'flex';
+  if(ui.chapter==='ai') wireAI();
 }
+
+/* ---------- 表紙 ---------- */
+function renderCover(t){
+  let cd='';
+  if(t.startDate){
+    const d=daysUntil(t.startDate);
+    const big = d>0?d:(d===0?'本日':Math.abs(d));
+    const lbl = d>0?'日後に出発':(d===0?'いってらっしゃい':'日前の旅');
+    cd=`<div class="cd"><span class="n">${big}</span><span class="l">${lbl}</span></div>`;
+  } else cd=`<div class="cd"><span class="l" style="color:var(--sub)">行き先と日程で<br>カウントダウン開始</span></div>`;
+  const opts=state.trips.map(x=>`<option value="${x.id}" ${x.id===state.currentTripId?'selected':''}>${esc(x.title)}</option>`).join('');
+  return `<div class="cover">
+    <div class="band">
+      <div class="kicker">Travel Journal</div>
+      <h1>${esc(t.title)}</h1>
+      ${t.destination?`<div class="dest">${esc(t.destination)}</div>`:''}
+      <div class="dates">${t.startDate?fmtRangeLong(t.startDate,t.endDate):'日程はこれから'}</div>
+      <div class="catwrap"><img src="${CAT_FULL}" alt="" style="width:100%"></div>
+      ${cd}
+    </div>
+    <div class="rule"></div>
+    <div class="summary">
+      <div class="s"><div class="n">${t.candidates.length}</div><div class="l">候補地</div></div>
+      <div class="s"><div class="n">${t.itinerary.length}</div><div class="l">予定</div></div>
+      <div class="s"><div class="n">${t.wishlist.length}</div><div class="l">行きたい</div></div>
+      <div class="s"><div class="n">${t.reservations.length}</div><div class="l">予約</div></div>
+    </div>
+    <div class="cover-actions">
+      <button class="btn-ai" id="goAI"><img src="${CAT_FACE}" alt="">AIコンシェルジュに相談する</button>
+      <div class="cover-meta">
+        <select id="tripSelect">${opts}</select>
+        <button class="mini" id="btnNewTrip" title="新しい旅行">＋</button>
+        <button class="mini" id="btnEditTrip" title="この旅行を編集">✎</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function chapHead(idx,title,sub){ return `<div class="chap-head"><div class="idx">${idx}</div><h2>${title}</h2><p>${sub||''}</p></div>`; }
+function emptyState(title,sub){ return `<div class="empty"><div class="catwrap"><img src="${CAT_FULL}" style="width:100%" alt=""></div><b>${title}</b><span>${sub}</span></div>`; }
+function mapSearch(q){ return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q); }
+function mapChip(q){ return q?`<a class="chip-link map" href="${mapSearch(q)}" target="_blank" rel="noopener">📍 地図で見る</a>`:''; }
+function urlChip(url){ if(!url)return''; const u=/^https?:\/\//.test(url)?url:'https://'+url; return `<a class="chip-link" href="${esc(u)}" target="_blank" rel="noopener">🔗 リンク</a>`; }
 
 /* ---------- 候補地 ---------- */
 function renderCand(t){
-  let h = secTitle('📍 旅行の候補地', '2人で♥を押して行きたい所を選ぼう');
-  if(!t.candidates.length) return h + empty('🗺','候補地がまだありません','右下の＋から、気になる場所を追加してみましょう');
-  // いいねが多い順
-  const sorted = [...t.candidates].sort((a,b)=>(b.likedBy?.length||0)-(a.likedBy?.length||0));
-  h += sorted.map(c=>{
-    const liked = c.likedBy||[];
-    const both = liked.length===2;
+  let h=chapHead('Ⅰ','旅行の候補地','2人で♡を押して行き先を選びましょう');
+  if(!t.candidates.length) return h+emptyState('候補地はまだありません','右下の＋から気になる場所を追加。地図でも確認できます');
+  const sorted=[...t.candidates].sort((a,b)=>(b.likedBy?.length||0)-(a.likedBy?.length||0));
+  h+=sorted.map(c=>{ const liked=c.likedBy||[]; const both=liked.length===2;
     return `<div class="card" data-edit-type="cand" data-id="${c.id}">
-      <div class="row1">
-        <div class="ttl">${both?'💞 ':''}${esc(c.name)}</div>
-        <button class="mini-btn del" data-del="cand" data-id="${c.id}">🗑</button>
-      </div>
+      <div class="row1"><div class="ttl">${both?'❦ ':''}${esc(c.name)}</div>
+        <button class="mini-btn" data-del="cand" data-id="${c.id}">✕</button></div>
       ${c.area?`<div class="meta">📍 ${esc(c.area)}</div>`:''}
       ${c.note?`<div class="note">${esc(c.note)}</div>`:''}
-      ${linkHtml(c.url)}
-      <div class="likes">
-        ${state.members.map((nm,i)=>{
-          const on = liked.includes(i);
-          return `<button class="like-btn ${on?'on':''}" data-like="${c.id}" data-mi="${i}">
-            ${on?'❤️':'🤍'} ${esc(nm)}</button>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }).join('');
+      <div class="actions">${mapChip(c.name+(c.area?(' '+c.area):''))}${urlChip(c.url)}</div>
+      <div class="likes">${state.members.map((nm,i)=>{const on=liked.includes(i);
+        return `<button class="like-btn ${on?'on':''}" data-like="${c.id}" data-mi="${i}">${on?'❤︎':'♡'} ${esc(nm)}</button>`;}).join('')}</div>
+    </div>`;}).join('');
   return h;
 }
 
-/* ---------- しおり(日程) ---------- */
+/* ---------- しおり ---------- */
 function renderPlan(t){
-  let h = secTitle('🗓 旅のしおり', '日付ごとに予定を並べよう');
-  if(!t.itinerary.length) return h + empty('🗓','まだ予定がありません','＋から、時間と行き先を追加しましょう');
-  const items = [...t.itinerary].sort((a,b)=>
-    (a.day||'').localeCompare(b.day||'') || (a.time||'').localeCompare(b.time||''));
-  let lastDay = null;
+  let h=chapHead('Ⅱ','旅のしおり','日付ごとの予定。1日のルートも地図で開けます');
+  if(!t.itinerary.length) return h+emptyState('まだ予定がありません','＋から時間と行き先を。猫と一緒に組み立てましょう');
+  const items=[...t.itinerary].sort((a,b)=>(a.day||'').localeCompare(b.day||'')||(a.time||'').localeCompare(b.time||''));
+  let lastDay=null, dayPlaces=[];
+  const flush=()=>{ if(dayPlaces.length>=2){ const url='https://www.google.com/maps/dir/'+dayPlaces.map(encodeURIComponent).join('/');
+    h+=`<a class="chip-link map" style="margin:-4px 4px 14px" href="${url}" target="_blank" rel="noopener">🗺 この日のルートを地図で開く</a>`; } dayPlaces=[]; };
   items.forEach(it=>{
-    if(it.day!==lastDay){
-      h += `<div class="group-h">${it.day?fmtDay(it.day):'日付未設定'}</div>`;
-      lastDay = it.day;
-    }
-    h += `<div class="card" data-edit-type="plan" data-id="${it.id}">
-      <div class="row1">
-        <div class="ttl">${it.time?`<span class="tag">${esc(it.time)}</span>`:''}${esc(it.title)}</div>
-        <button class="mini-btn del" data-del="plan" data-id="${it.id}">🗑</button>
-      </div>
+    if(it.day!==lastDay){ flush(); h+=`<div class="group-h">${it.day?fmtDay(it.day):'日付未設定'}</div>`; lastDay=it.day; }
+    if(it.place||it.title) dayPlaces.push(it.place||it.title);
+    h+=`<div class="card" data-edit-type="plan" data-id="${it.id}">
+      <div class="row1"><div class="ttl">${it.time?`<span class="tag rose">${esc(it.time)}</span>`:''}${esc(it.title)}</div>
+        <button class="mini-btn" data-del="plan" data-id="${it.id}">✕</button></div>
       ${it.place?`<div class="meta">📍 ${esc(it.place)}</div>`:''}
       ${it.note?`<div class="note">${esc(it.note)}</div>`:''}
-      ${linkHtml(it.url)}
+      <div class="actions">${mapChip(it.place||it.title)}${urlChip(it.url)}</div>
     </div>`;
   });
+  flush();
   return h;
 }
 
-/* ---------- 行きたい場所 ---------- */
+/* ---------- 行きたい ---------- */
 function renderWish(t){
-  let h = secTitle('⭐️ 行きたい場所メモ', '気になるスポットをストック');
-  if(!t.wishlist.length) return h + empty('⭐️','まだメモがありません','カフェ・観光地・お店など、行きたい所を追加');
-  const cats = {};
-  t.wishlist.forEach(w=>{ (cats[w.category||'その他'] ??= []).push(w); });
-  for(const cat in cats){
-    h += `<div class="group-h">${esc(cat)}</div>`;
-    h += cats[cat].map(w=>`<div class="card" data-edit-type="wish" data-id="${w.id}">
-      <div class="row1">
-        <div class="ttl" style="${w.done?'text-decoration:line-through;color:var(--sub)':''}">${esc(w.name)}</div>
-        <button class="mini-btn" data-wishdone="${w.id}">${w.done?'↩️':'✅'}</button>
-        <button class="mini-btn del" data-del="wish" data-id="${w.id}">🗑</button>
-      </div>
+  let h=chapHead('Ⅲ','行きたい場所メモ','カフェ・観光地などをストック');
+  if(!t.wishlist.length) return h+emptyState('まだメモがありません','行ってみたいお店やスポットを追加');
+  const cats={}; t.wishlist.forEach(w=>{(cats[w.category||'その他']??=[]).push(w);});
+  for(const cat in cats){ h+=`<div class="group-h">${esc(cat)}</div>`;
+    h+=cats[cat].map(w=>`<div class="card" data-edit-type="wish" data-id="${w.id}">
+      <div class="row1"><div class="ttl" style="${w.done?'text-decoration:line-through;color:var(--sub)':''}">${esc(w.name)}</div>
+        <button class="mini-btn" data-wishdone="${w.id}">${w.done?'↺':'✓'}</button>
+        <button class="mini-btn" data-del="wish" data-id="${w.id}">✕</button></div>
       ${w.note?`<div class="note">${esc(w.note)}</div>`:''}
-      ${linkHtml(w.url)}
+      <div class="actions">${mapChip(w.name)}${urlChip(w.url)}</div>
     </div>`).join('');
   }
   return h;
@@ -416,401 +422,275 @@ function renderWish(t){
 
 /* ---------- 予算・割り勘 ---------- */
 function renderMoney(t){
-  let h = secTitle('💰 支出・割り勘', 'タップで編集／記録すると自動精算');
-  const exp = t.expenses;
-  const total = exp.reduce((s,e)=>s+(+e.amount||0),0);
-  // 各自の支払い & 負担
-  const paid=[0,0], owe=[0,0];
-  exp.forEach(e=>{
-    const amt=+e.amount||0; const by=e.paidBy??0;
-    paid[by]+=amt;
-    const sw = (e.splitWith&&e.splitWith.length)?e.splitWith:[0,1];
-    const each = amt/sw.length;
-    sw.forEach(m=>owe[m]+=each);
-  });
-  const net0 = paid[0]-owe[0]; // +なら受け取る
-  h += `<div class="summary">
-    <div class="box"><div class="n">¥${yen(total)}</div><div class="l">合計</div></div>
-    <div class="box"><div class="n">¥${yen(paid[0])}</div><div class="l">${esc(state.members[0])}の支払</div></div>
-    <div class="box"><div class="n">¥${yen(paid[1])}</div><div class="l">${esc(state.members[1])}の支払</div></div>
-  </div>`;
-  if(Math.round(net0)!==0){
-    const from = net0<0 ? state.members[0] : state.members[1];
-    const to   = net0<0 ? state.members[1] : state.members[0];
-    h += `<div class="settle"><small>精算</small>💸 ${esc(from)} → ${esc(to)} に <b>¥${yen(Math.abs(Math.round(net0)))}</b> 渡すと割り勘完了！</div>`;
-  } else if(exp.length){
-    h += `<div class="settle"><small>精算</small>✅ ぴったり割り勘できています</div>`;
-  }
-  if(!exp.length) return h + empty('💰','まだ支出がありません','＋から、使ったお金を記録しましょう');
+  let h=chapHead('Ⅳ','支出と割り勘','タップで編集。自動で精算します');
+  const exp=t.expenses; const total=exp.reduce((s,e)=>s+(+e.amount||0),0);
+  const paid=[0,0],owe=[0,0];
+  exp.forEach(e=>{ const amt=+e.amount||0,by=e.paidBy??0; paid[by]+=amt;
+    const sw=(e.splitWith&&e.splitWith.length)?e.splitWith:[0,1]; const each=amt/sw.length; sw.forEach(m=>owe[m]+=each); });
+  const net0=paid[0]-owe[0];
+  h+=`<div class="ledger"><div class="total">¥${yen(total)}<br><small>2人の合計支出</small></div>
+    <div class="split"><div class="p"><div class="nm">${esc(state.members[0])}</div><div class="v">¥${yen(paid[0])}</div></div>
+    <div class="p"><div class="nm">${esc(state.members[1])}</div><div class="v">¥${yen(paid[1])}</div></div></div></div>`;
+  if(Math.round(net0)!==0){ const from=net0<0?state.members[0]:state.members[1], to=net0<0?state.members[1]:state.members[0];
+    h+=`<div class="settle"><small>Settlement</small>${esc(from)} → ${esc(to)} へ <b>¥${yen(Math.abs(Math.round(net0)))}</b><br>で割り勘完了です</div>`;
+  } else if(exp.length) h+=`<div class="settle"><small>Settlement</small>ぴったり割り勘できています ✿</div>`;
+  if(!exp.length) return h+emptyState('まだ支出がありません','旅行中に使ったお金を＋から記録');
   const sorted=[...exp].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  h += sorted.map(e=>`<div class="card" data-edit-type="money" data-id="${e.id}">
-    <div class="row1">
-      <div class="ttl">${esc(e.title)} <span class="tag pink">¥${yen(+e.amount||0)}</span></div>
-      <button class="mini-btn del" data-del="money" data-id="${e.id}">🗑</button>
-    </div>
-    <div class="meta">${e.category?esc(e.category)+'・':''}${esc(state.members[e.paidBy??0])}が支払${e.date?'・'+fmtDay(e.date):''}</div>
+  h+=sorted.map(e=>`<div class="card" data-edit-type="money" data-id="${e.id}">
+    <div class="row1"><div class="ttl">${esc(e.title)} <span class="tag rose">¥${yen(+e.amount||0)}</span></div>
+      <button class="mini-btn" data-del="money" data-id="${e.id}">✕</button></div>
+    <div class="meta">${e.category?esc(e.category)+'・':''}${esc(state.members[e.paidBy??0])}が支払${e.date?'・'+fmtDay(e.date):''}・${(e.splitWith&&e.splitWith.length===1)?'個人':'2人で割る'}</div>
   </div>`).join('');
   return h;
 }
 
 /* ---------- 持ち物 ---------- */
 function renderPack(t){
-  let h = secTitle('🧳 持ち物チェック', 'タップでチェック');
-  if(!t.packing.length) return h + empty('🧳','まだ持ち物がありません','＋から追加。「基本セット」を一括追加もできます');
-  const done = t.packing.filter(p=>p.checked).length;
-  h += `<div class="note-box">✅ ${done} / ${t.packing.length} 個 準備OK</div>`;
-  const cats={};
-  t.packing.forEach(p=>{ (cats[p.category||'その他'] ??= []).push(p); });
-  for(const cat in cats){
-    h += `<div class="group-h">${esc(cat)}</div>`;
-    h += cats[cat].map(p=>`<div class="check-row ${p.checked?'done':''}" data-pack="${p.id}">
-      <div class="box">${p.checked?'✓':''}</div>
-      <div class="nm">${esc(p.name)}</div>
-      <button class="mini-btn del" data-del="pack" data-id="${p.id}">🗑</button>
-    </div>`).join('');
+  let h=chapHead('Ⅴ','持ち物チェック','タップでチェック。基本セットも一括追加');
+  if(!t.packing.length) return h+emptyState('まだ持ち物がありません','＋から追加。「旅行の基本セット」もどうぞ');
+  const done=t.packing.filter(p=>p.checked).length;
+  h+=`<div class="settle" style="background:linear-gradient(120deg,var(--rose),#e6a8a0)"><small>Packing</small>${done} / ${t.packing.length} 個 準備OK</div>`;
+  const cats={}; t.packing.forEach(p=>{(cats[p.category||'その他']??=[]).push(p);});
+  for(const cat in cats){ h+=`<div class="group-h">${esc(cat)}</div>`;
+    h+=cats[cat].map(p=>`<div class="check-row ${p.checked?'done':''}" data-pack="${p.id}">
+      <div class="box">${p.checked?'✓':''}</div><div class="nm">${esc(p.name)}</div>
+      <button class="mini-btn" data-del="pack" data-id="${p.id}">✕</button></div>`).join('');
   }
   return h;
 }
 
-/* ---------- 予約情報 ---------- */
+/* ---------- 予約 ---------- */
 function renderResv(t){
-  let h = secTitle('🎫 予約情報', 'ホテル・交通・お店の予約を保管');
-  if(!t.reservations.length) return h + empty('🎫','まだ予約がありません','＋から予約番号や時間を記録しましょう');
+  let h=chapHead('Ⅵ','予約情報','ホテル・交通・お店の予約を保管');
+  if(!t.reservations.length) return h+emptyState('まだ予約がありません','予約番号や時間を＋から記録');
   const sorted=[...t.reservations].sort((a,b)=>(a.datetime||'').localeCompare(b.datetime||''));
-  h += sorted.map(r=>`<div class="card" data-edit-type="resv" data-id="${r.id}">
-    <div class="row1">
-      <div class="ttl"><span class="tag">${esc(r.type||'予約')}</span>${esc(r.title)}</div>
-      <button class="mini-btn del" data-del="resv" data-id="${r.id}">🗑</button>
-    </div>
+  h+=sorted.map(r=>`<div class="card" data-edit-type="resv" data-id="${r.id}">
+    <div class="row1"><div class="ttl"><span class="tag">${esc(r.type||'予約')}</span>${esc(r.title)}</div>
+      <button class="mini-btn" data-del="resv" data-id="${r.id}">✕</button></div>
     ${r.datetime?`<div class="meta">🕒 ${fmtDateTime(r.datetime)}</div>`:''}
     ${r.place?`<div class="meta">📍 ${esc(r.place)}</div>`:''}
-    ${r.confirmationNo?`<div class="meta">🔢 予約番号：<b>${esc(r.confirmationNo)}</b></div>`:''}
+    ${r.confirmationNo?`<div class="meta">🔖 予約番号：<b style="color:var(--ink)">${esc(r.confirmationNo)}</b></div>`:''}
     ${r.note?`<div class="note">${esc(r.note)}</div>`:''}
-    ${linkHtml(r.url)}
+    <div class="actions">${mapChip(r.place||r.title)}${urlChip(r.url)}</div>
   </div>`).join('');
   return h;
 }
 
-/* ============================================================
-   モーダル (追加フォーム)
-============================================================ */
-function openModal(html){
-  document.getElementById('modal').innerHTML = html;
-  document.getElementById('modalBg').classList.add('show');
+/* ---------- AIコンシェルジュ ---------- */
+function renderAI(t){
+  if(!state.geminiKey){
+    return `<div class="ai-intro"><div class="catwrap"><img src="${CAT_FULL}" style="width:100%" alt=""></div>
+      <h2>AIコンシェルジュ</h2><p>行き先と日程を伝えると、猫のコンシェルジュが<br>モデルコースを考えてくれます。</p></div>
+      <div class="note-box">使うには無料のGeminAPIキーが必要です（月額契約とは別）。設定方法はセットアップガイドを見てください。</div>
+      <button class="btn rose" id="aiToSettings" style="width:100%">⚙️ 設定でGeminiキーを登録</button>`;
+  }
+  let chat=ui.chat.map(m=> m.role==='me'
+    ? `<div class="ai-bubble me">${esc(m.text)}</div>`
+    : `<div class="ai-bubble cat"><div class="who"><img src="${CAT_FACE}">コンシェルジュ</div>${m.html||esc(m.text)}</div>`).join('');
+  return `<div class="chap-head"><div class="idx">Concierge</div><h2>AIコンシェルジュ</h2>
+      <p>${esc(t.destination||t.title)} の旅を一緒に考えます</p></div>
+    <div class="ai-quick">
+      <button data-quick="plan">📋 モデルコースを作って</button>
+      <button data-quick="food">🍽 グルメのおすすめ</button>
+      <button data-quick="rain">☔️ 雨の日プラン</button>
+    </div>
+    <div id="chatLog">${chat||`<div class="ai-bubble cat"><div class="who"><img src="${CAT_FACE}">コンシェルジュ</div>こんにちは。${esc(t.destination||'行き先')}の旅、どんな雰囲気にしましょう？「2泊3日でのんびり」など教えてください。下のボタンからも相談できます。</div>`}</div>
+    <div class="ai-field" style="margin-top:12px"><textarea id="aiInput" placeholder="例：2泊3日、温泉とカフェ巡り、移動はゆったりめで"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn rose" id="aiPlan">📋 プランを作る</button>
+      <button class="btn primary" id="aiAsk">💬 相談する</button>
+    </div>`;
 }
+
+/* ============================================================ Gemini */
+async function geminiGenerate(prompt, schema){
+  const model=state.geminiModel||'gemini-2.0-flash';
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  const body={contents:[{parts:[{text:prompt}]}]};
+  if(schema) body.generationConfig={responseMimeType:'application/json',responseSchema:schema};
+  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':state.geminiKey},body:JSON.stringify(body)});
+  if(!res.ok){ const tx=await res.text(); throw new Error('Gemini '+res.status+'：'+tx.slice(0,180)); }
+  const data=await res.json();
+  return (data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+}
+function tripContext(){ const t=curTrip();
+  let c=`行き先:${t.destination||t.title}`;
+  if(t.startDate) c+=` / 日程:${t.startDate}〜${t.endDate||t.startDate}`;
+  if(t.candidates.length) c+=` / 候補地:${t.candidates.map(x=>x.name).join('、')}`;
+  if(t.wishlist.length) c+=` / 行きたい:${t.wishlist.map(x=>x.name).join('、')}`;
+  return c;
+}
+function wireAI(){
+  const ts=document.getElementById('aiToSettings'); if(ts) ts.onclick=settingsModal;
+  document.querySelectorAll('[data-quick]').forEach(b=>b.onclick=()=>{
+    const q={plan:'この旅行のモデルコースを作って',food:'おすすめのグルメ・カフェを教えて',rain:'雨の日でも楽しめるプランを教えて'}[b.dataset.quick];
+    if(b.dataset.quick==='plan') doPlan(); else doAsk(q);
+  });
+  const ap=document.getElementById('aiPlan'); if(ap) ap.onclick=doPlan;
+  const aq=document.getElementById('aiAsk'); if(aq) aq.onclick=()=>doAsk(document.getElementById('aiInput').value.trim());
+  const addp=document.getElementById('addPlan'); if(addp) addp.onclick=addPlanToItinerary;
+}
+function pushChat(role,obj){ ui.chat.push(typeof obj==='string'?{role,text:obj}:{role,...obj}); }
+function busyBubble(msg){ const log=document.getElementById('chatLog');
+  const div=document.createElement('div'); div.className='ai-bubble cat'; div.id='busy';
+  div.innerHTML=`<div class="who"><img src="${CAT_FACE}">コンシェルジュ</div><span class="spinner"></span> ${msg}`;
+  log.appendChild(div); div.scrollIntoView({behavior:'smooth'}); }
+function dropBusy(){ const b=document.getElementById('busy'); if(b) b.remove(); }
+
+async function doAsk(text){
+  if(!text) return;
+  pushChat('me',text); render();
+  busyBubble('考え中…');
+  try{
+    const out=await geminiGenerate(`あなたは恋人どうしの旅行を手伝う、やさしい猫のコンシェルジュです。絵文字を少し交え、簡潔で具体的に。\n旅行情報：${tripContext()}\n相談：${text}`);
+    pushChat('cat',out); render();
+  }catch(e){ pushChat('cat','うまく取得できませんでした🙇 '+e.message); render(); }
+}
+async function doPlan(){
+  const extra=(document.getElementById('aiInput')?.value||'').trim();
+  pushChat('me','モデルコースを作って'+(extra?('（'+extra+'）'):'')); render();
+  busyBubble('しおりを考えています…');
+  const t=curTrip();
+  const schema={type:'object',properties:{days:{type:'array',items:{type:'object',properties:{
+    day:{type:'integer'}, items:{type:'array',items:{type:'object',properties:{
+      time:{type:'string'},title:{type:'string'},place:{type:'string'},note:{type:'string'}},required:['title']}}
+    },required:['day','items']}}},required:['days']};
+  try{
+    const raw=await geminiGenerate(`恋人2人の旅行のモデルコースを日本語で作成。\n旅行情報：${tripContext()}\n要望：${extra||'のんびり楽しめる王道プラン'}\n各日timeは"10:00"形式、placeは地図検索できる実在の場所名。`,schema);
+    const data=JSON.parse(raw);
+    ui.lastPlan=data;
+    let html='プランができました🐾 気に入ったら「しおりに追加」できます。<div style="margin-top:10px">';
+    (data.days||[]).forEach(d=>{ html+=`<div class="plan-day"><div class="dh">${t.startDate?fmtDay(addDays(t.startDate,d.day-1)):'DAY '+d.day}</div>`;
+      (d.items||[]).forEach(it=>{ html+=`<div class="pi">${it.time?`<span class="t">${esc(it.time)}</span>`:''}${esc(it.title)}${it.place?` <span style="color:var(--sub)">／${esc(it.place)}</span>`:''}</div>`; });
+      html+='</div>'; });
+    html+=`</div><button class="btn rose" id="addPlan" style="margin-top:6px;width:100%">＋ このプランをしおりに追加</button>`;
+    pushChat('cat',{html}); render();
+    setTimeout(()=>{ const b=document.getElementById('addPlan'); if(b) b.onclick=addPlanToItinerary; },30);
+  }catch(e){ pushChat('cat','プラン作成に失敗しました🙇 '+e.message); render(); }
+}
+function addPlanToItinerary(){
+  const t=curTrip(); const data=ui.lastPlan; if(!data) return;
+  (data.days||[]).forEach(d=>{ const day=t.startDate?addDays(t.startDate,d.day-1):'';
+    (d.items||[]).forEach(it=>{ t.itinerary.push({id:uid(),day,time:it.time||'',title:it.title||'',place:it.place||'',note:it.note||'',url:''}); }); });
+  ui.chapter='plan'; save();
+}
+
+/* ============================================================ モーダル / 編集 */
+function openModal(html){ document.getElementById('modal').innerHTML='<div class="grip"></div>'+html; document.getElementById('modalBg').classList.add('show'); }
 function closeModal(){ document.getElementById('modalBg').classList.remove('show'); }
-
 function val(id){ const el=document.getElementById(id); return el?el.value.trim():''; }
-
-const TYPE_KEY = {cand:'candidates',plan:'itinerary',wish:'wishlist',money:'expenses',pack:'packing',resv:'reservations'};
 function findItem(type,id){ return (curTrip()[TYPE_KEY[type]]||[]).find(x=>x.id===id); }
+function addModal(){ const map={cand:'cand',plan:'plan',wish:'wish',money:'money',pack:'pack',resv:'resv'}; if(map[ui.chapter]) openForm(ui.chapter,null); }
 
-function addModal(){ openForm(ui.tab, null); }
-
-function openForm(type, item){
-  const d = item || {};
-  const ed = item ? item.id : '';
-  const splitVal = (d.splitWith && d.splitWith.length===1) ? String(d.splitWith[0]) : 'both';
-  const forms = {
-    cand:()=>formCard(item?'候補地を編集':'候補地を追加','cand',`
-      ${f('候補地の名前','c_name','例：京都・嵐山',null,d.name)}
-      ${f('エリア / 地域','c_area','例：京都府',null,d.area)}
-      ${fArea('メモ','c_note','行きたい理由、見どころなど',d.note)}
-      ${f('リンク (URL)','c_url','公式サイトや地図のURL',null,d.url)}
-    `,ed),
-    plan:()=>formCard(item?'予定を編集':'予定を追加','plan',`
-      ${fDate('日付','p_day',d.day)}
-      ${f('時間','p_time','例：10:00','time',d.time)}
-      ${f('予定タイトル','p_title','例：清水寺を観光',null,d.title)}
-      ${f('場所','p_place','例：清水寺',null,d.place)}
-      ${fArea('メモ','p_note','',d.note)}
-      ${f('リンク (URL)','p_url','',null,d.url)}
-    `,ed),
-    wish:()=>formCard(item?'行きたい場所を編集':'行きたい場所を追加','wish',`
-      ${f('名前','w_name','例：％アラビカ 京都',null,d.name)}
-      ${fSel('カテゴリ','w_cat',['カフェ・グルメ','観光地','ショッピング','体験・アクティビティ','その他'],d.category)}
-      ${fArea('メモ','w_note','',d.note)}
-      ${f('リンク (URL)','w_url','',null,d.url)}
-    `,ed),
-    money:()=>formCard(item?'支出を編集':'支出を追加','money',`
-      ${f('内容','m_title','例：ホテル代',null,d.title)}
-      ${f('金額 (円)','m_amount','例：12000','number',d.amount)}
-      ${fSel('支払った人','m_paid',state.members,d.paidBy??0)}
-      ${fSel('カテゴリ','m_cat',['宿泊','交通','食事','観光・入場','買い物','その他'],d.category)}
-      ${fDate('日付','m_date',d.date)}
-      <div class="field"><label>割り勘の対象</label>
-        <div class="seg" id="m_split">
-          <button type="button" data-split="both" class="${splitVal==='both'?'on':''}">2人で割る</button>
-          <button type="button" data-split="0" class="${splitVal==='0'?'on':''}">${esc(state.members[0])}だけ</button>
-          <button type="button" data-split="1" class="${splitVal==='1'?'on':''}">${esc(state.members[1])}だけ</button>
-        </div></div>
-    `,ed),
-    pack:()=>formCard(item?'持ち物を編集':'持ち物を追加','pack',`
-      ${f('持ち物の名前','k_name','例：充電器',null,d.name)}
-      ${fSel('カテゴリ','k_cat',['身の回り','衣類','洗面・コスメ','ガジェット','書類・お金','その他'],d.category)}
-      ${item?'':'<div class="note-box" id="packPreset" style="cursor:pointer">📦 タップで「旅行の基本セット」をまとめて追加</div>'}
-    `,ed),
-    resv:()=>formCard(item?'予約情報を編集':'予約情報を追加','resv',`
-      ${fSel('種類','r_type',['ホテル','新幹線・電車','飛行機','レンタカー','レストラン','アクティビティ','その他'],d.type)}
-      ${f('名称','r_title','例：◯◯ホテル',null,d.title)}
-      ${f('日時','r_dt','','datetime-local',d.datetime)}
-      ${f('場所','r_place','',null,d.place)}
-      ${f('予約番号','r_conf','確認番号など',null,d.confirmationNo)}
-      ${fArea('メモ','r_note','',d.note)}
-      ${f('リンク (URL)','r_url','',null,d.url)}
-    `,ed),
+function openForm(type,item){
+  const d=item||{}, ed=item?item.id:''; const splitVal=(d.splitWith&&d.splitWith.length===1)?String(d.splitWith[0]):'both';
+  const forms={
+    cand:()=>card(item?'候補地を編集':'候補地を追加','cand',`${f('候補地の名前','c_name','例：京都・嵐山',null,d.name)}${f('エリア / 地域','c_area','例：京都府',null,d.area)}${fA('メモ','c_note','行きたい理由・見どころ',d.note)}${f('リンク (URL)','c_url','公式サイトや地図',null,d.url)}`,ed),
+    plan:()=>card(item?'予定を編集':'予定を追加','plan',`${fD('日付','p_day',d.day)}${f('時間','p_time','例：10:00','time',d.time)}${f('予定','p_title','例：清水寺を観光',null,d.title)}${f('場所','p_place','例：清水寺',null,d.place)}${fA('メモ','p_note','',d.note)}${f('リンク (URL)','p_url','',null,d.url)}`,ed),
+    wish:()=>card(item?'行きたい場所を編集':'行きたい場所を追加','wish',`${f('名前','w_name','例：％アラビカ 京都',null,d.name)}${fS('カテゴリ','w_cat',['カフェ・グルメ','観光地','ショッピング','体験・アクティビティ','その他'],d.category)}${fA('メモ','w_note','',d.note)}${f('リンク (URL)','w_url','',null,d.url)}`,ed),
+    money:()=>card(item?'支出を編集':'支出を追加','money',`${f('内容','m_title','例：ホテル代',null,d.title)}${f('金額 (円)','m_amount','例：12000','number',d.amount)}${fS('支払った人','m_paid',state.members,d.paidBy??0)}${fS('カテゴリ','m_cat',['宿泊','交通','食事','観光・入場','買い物','その他'],d.category)}${fD('日付','m_date',d.date)}<div class="field"><label>割り勘の対象</label><div class="seg" id="m_split"><button type="button" data-split="both" class="${splitVal==='both'?'on':''}">2人で割る</button><button type="button" data-split="0" class="${splitVal==='0'?'on':''}">${esc(state.members[0])}だけ</button><button type="button" data-split="1" class="${splitVal==='1'?'on':''}">${esc(state.members[1])}だけ</button></div></div>`,ed),
+    pack:()=>card(item?'持ち物を編集':'持ち物を追加','pack',`${f('持ち物の名前','k_name','例：充電器',null,d.name)}${fS('カテゴリ','k_cat',['身の回り','衣類','洗面・コスメ','ガジェット','書類・お金','その他'],d.category)}${item?'':'<div class="note-box" id="packPreset" style="cursor:pointer">📦 タップで「旅行の基本セット」をまとめて追加</div>'}`,ed),
+    resv:()=>card(item?'予約情報を編集':'予約情報を追加','resv',`${fS('種類','r_type',['ホテル','新幹線・電車','飛行機','レンタカー','レストラン','アクティビティ','その他'],d.type)}${f('名称','r_title','例：◯◯ホテル',null,d.title)}${f('日時','r_dt','','datetime-local',d.datetime)}${f('場所','r_place','',null,d.place)}${f('予約番号','r_conf','確認番号など',null,d.confirmationNo)}${fA('メモ','r_note','',d.note)}${f('リンク (URL)','r_url','',null,d.url)}`,ed),
   };
   openModal(forms[type]());
-  // 割り勘セグメント
-  const split = document.getElementById('m_split');
-  if(split){ split.addEventListener('click',e=>{
-    const b=e.target.closest('button'); if(!b)return;
-    [...split.children].forEach(x=>x.classList.remove('on')); b.classList.add('on');
-  }); }
-  // 持ち物プリセット
-  const pp = document.getElementById('packPreset');
-  if(pp){ pp.addEventListener('click',()=>{ addPackPreset(); closeModal(); }); }
+  const split=document.getElementById('m_split'); if(split) split.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...split.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');});
+  const pp=document.getElementById('packPreset'); if(pp) pp.addEventListener('click',()=>{addPackPreset();closeModal();});
 }
-
-function saveFromModal(type, editId){
-  const t = curTrip();
-  const arr = t[TYPE_KEY[type]];
-  const old = editId ? arr.find(x=>x.id===editId) : null;
-  let obj;
-  if(type==='cand'){
-    if(!val('c_name')) return;
-    obj={name:val('c_name'),area:val('c_area'),note:val('c_note'),url:val('c_url')};
-  }
-  if(type==='plan'){
-    if(!val('p_title')) return;
-    obj={day:val('p_day'),time:val('p_time'),title:val('p_title'),place:val('p_place'),note:val('p_note'),url:val('p_url')};
-  }
-  if(type==='wish'){
-    if(!val('w_name')) return;
-    obj={name:val('w_name'),category:val('w_cat'),note:val('w_note'),url:val('w_url')};
-  }
-  if(type==='money'){
-    if(!val('m_title')||!val('m_amount')) return;
-    const seg=document.querySelector('#m_split .on')?.dataset.split||'both';
-    obj={title:val('m_title'),amount:+val('m_amount'),paidBy:+val('m_paid')||0,
-      category:val('m_cat'),date:val('m_date'),splitWith:seg==='both'?[0,1]:[+seg]};
-  }
-  if(type==='pack'){
-    if(!val('k_name')) return;
-    obj={name:val('k_name'),category:val('k_cat')};
-  }
-  if(type==='resv'){
-    if(!val('r_title')) return;
-    obj={type:val('r_type'),title:val('r_title'),datetime:val('r_dt'),
-      place:val('r_place'),confirmationNo:val('r_conf'),note:val('r_note'),url:val('r_url')};
-  }
-  if(old){ Object.assign(old, obj); }
-  else { arr.push(Object.assign({id:uid(), likedBy:[], done:false, checked:false}, obj)); }
+function saveFromModal(type,editId){
+  const t=curTrip(), arr=t[TYPE_KEY[type]], old=editId?arr.find(x=>x.id===editId):null; let obj;
+  if(type==='cand'){ if(!val('c_name'))return; obj={name:val('c_name'),area:val('c_area'),note:val('c_note'),url:val('c_url')}; }
+  if(type==='plan'){ if(!val('p_title'))return; obj={day:val('p_day'),time:val('p_time'),title:val('p_title'),place:val('p_place'),note:val('p_note'),url:val('p_url')}; }
+  if(type==='wish'){ if(!val('w_name'))return; obj={name:val('w_name'),category:val('w_cat'),note:val('w_note'),url:val('w_url')}; }
+  if(type==='money'){ if(!val('m_title')||!val('m_amount'))return; const seg=document.querySelector('#m_split .on')?.dataset.split||'both';
+    obj={title:val('m_title'),amount:+val('m_amount'),paidBy:+val('m_paid')||0,category:val('m_cat'),date:val('m_date'),splitWith:seg==='both'?[0,1]:[+seg]}; }
+  if(type==='pack'){ if(!val('k_name'))return; obj={name:val('k_name'),category:val('k_cat')}; }
+  if(type==='resv'){ if(!val('r_title'))return; obj={type:val('r_type'),title:val('r_title'),datetime:val('r_dt'),place:val('r_place'),confirmationNo:val('r_conf'),note:val('r_note'),url:val('r_url')}; }
+  if(old) Object.assign(old,obj); else arr.push(Object.assign({id:uid(),likedBy:[],done:false,checked:false},obj));
   closeModal(); save();
 }
-
-function addPackPreset(){
-  const t = curTrip();
-  const preset = {
-    '身の回り':['財布','鍵','常備薬','マスク'],
-    '衣類':['着替え','下着','パジャマ','上着'],
-    '洗面・コスメ':['歯ブラシ','スキンケア','メイク道具'],
-    'ガジェット':['充電器','モバイルバッテリー','イヤホン'],
-    '書類・お金':['身分証','クレジットカード','現金']
-  };
-  for(const cat in preset) preset[cat].forEach(n=>
-    t.packing.push({id:uid(),name:n,category:cat,checked:false}));
-  save();
+function addPackPreset(){ const t=curTrip();
+  const preset={'身の回り':['財布','鍵','常備薬','マスク'],'衣類':['着替え','下着','パジャマ','上着'],'洗面・コスメ':['歯ブラシ','スキンケア','メイク道具'],'ガジェット':['充電器','モバイルバッテリー','イヤホン'],'書類・お金':['身分証','クレジットカード','現金']};
+  for(const cat in preset) preset[cat].forEach(n=>t.packing.push({id:uid(),name:n,category:cat,checked:false})); save();
 }
 
-/* ============================================================
-   設定 & 同期モーダル
-============================================================ */
+/* ---------- 設定 / 同期 ---------- */
 function settingsModal(){
+  const t=curTrip();
   openModal(`<h3>⚙️ 設定</h3>
-    <div class="field"><label>2人の名前</label>
-      <div class="two">
-        <input id="s_m0" value="${esc(state.members[0])}" />
-        <input id="s_m1" value="${esc(state.members[1])}" />
-      </div>
-    </div>
-    <div class="field"><label>この端末を使う人</label>
-      <div class="seg" id="s_me">
-        <button type="button" data-me="0" class="${state.me===0?'on':''}">${esc(state.members[0])}</button>
-        <button type="button" data-me="1" class="${state.me===1?'on':''}">${esc(state.members[1])}</button>
-      </div>
-    </div>
+    <div class="field"><label>2人の名前</label><div class="two"><input id="s_m0" value="${esc(state.members[0])}"><input id="s_m1" value="${esc(state.members[1])}"></div></div>
+    <div class="field"><label>この端末を使う人</label><div class="seg" id="s_me"><button type="button" data-me="0" class="${state.me===0?'on':''}">${esc(state.members[0])}</button><button type="button" data-me="1" class="${state.me===1?'on':''}">${esc(state.members[1])}</button></div></div>
     <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
-    <div class="field"><label>この旅行のタイトル</label>
-      <input id="s_title" value="${esc(curTrip().title)}" /></div>
-    <div class="field"><label>行き先（決定）</label>
-      <input id="s_dest" value="${esc(curTrip().destination)}" placeholder="例：京都" /></div>
-    <div class="field"><label>日程</label>
-      <div class="two">
-        <input id="s_start" type="date" value="${curTrip().startDate}" />
-        <input id="s_end" type="date" value="${curTrip().endDate}" />
-      </div></div>
-    <div class="modal-actions">
-      <button class="btn ghost" id="s_delTrip">この旅行を削除</button>
-      <button class="btn primary" id="s_save">保存</button>
-    </div>`);
-  document.getElementById('s_me').addEventListener('click',e=>{
-    const b=e.target.closest('button'); if(!b)return;
-    [...e.currentTarget.children].forEach(x=>x.classList.remove('on')); b.classList.add('on');
-  });
+    <div class="field"><label>旅行のタイトル</label><input id="s_title" value="${esc(t.title)}"></div>
+    <div class="field"><label>行き先</label><input id="s_dest" value="${esc(t.destination)}" placeholder="例：京都"></div>
+    <div class="field"><label>日程</label><div class="two"><input id="s_start" type="date" value="${t.startDate}"><input id="s_end" type="date" value="${t.endDate}"></div></div>
+    <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
+    <div class="field"><label>✨ Gemini APIキー（AIコンシェルジュ用）</label><input id="s_gkey" value="${esc(state.geminiKey)}" placeholder="AIza... を貼り付け"></div>
+    <div class="field"><label>Geminiモデル</label><input id="s_gmodel" value="${esc(state.geminiModel)}" placeholder="gemini-2.0-flash"></div>
+    <div class="note-box">Geminiキーはこの端末だけに保存され、クラウド同期には含めません。取得方法はセットアップガイドへ。</div>
+    <div class="modal-actions"><button class="btn ghost" id="s_delTrip">旅行を削除</button><button class="btn primary" id="s_save">保存</button></div>`);
+  document.getElementById('s_me').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...e.currentTarget.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');});
   document.getElementById('s_save').onclick=()=>{
-    state.members=[val('s_m0')||'わたし', val('s_m1')||'パートナー'];
-    state.me=+document.querySelector('#s_me .on').dataset.me;
-    const t=curTrip();
-    t.title=val('s_title')||t.title; t.destination=val('s_dest');
-    t.startDate=val('s_start'); t.endDate=val('s_end');
+    state.members=[val('s_m0')||'わたし',val('s_m1')||'パートナー']; state.me=+document.querySelector('#s_me .on').dataset.me;
+    t.title=val('s_title')||t.title; t.destination=val('s_dest'); t.startDate=val('s_start'); t.endDate=val('s_end');
+    state.geminiKey=val('s_gkey'); state.geminiModel=val('s_gmodel')||'gemini-2.0-flash';
     closeModal(); save();
   };
-  document.getElementById('s_delTrip').onclick=()=>{
-    if(state.trips.length<=1){ alert('最後の1つは削除できません'); return; }
-    if(!confirm('この旅行を削除しますか？')) return;
-    state.trips=state.trips.filter(x=>x.id!==state.currentTripId);
-    state.currentTripId=state.trips[0].id;
-    closeModal(); save();
-  };
+  document.getElementById('s_delTrip').onclick=()=>{ if(state.trips.length<=1){alert('最後の1つは削除できません');return;}
+    if(!confirm('この旅行を削除しますか？'))return; state.trips=state.trips.filter(x=>x.id!==state.currentTripId); state.currentTripId=state.trips[0].id; ui.chapter='cover'; closeModal(); save(); };
 }
-
 function syncModal(){
-  const linked = state.firebaseConfig && state.pairCode;
+  const linked=state.firebaseConfig&&state.pairCode;
   openModal(`<h3>🔗 2人で同期</h3>
-    <div class="note-box">
-      <b>ペアコード</b>と<b>Firebase設定</b>を2人で同じものにすると、入力した内容がリアルタイムで共有されます。<br>
-      設定方法は同梱の「セットアップガイド」を見てください。
-    </div>
-    <div class="field"><label>ペアコード（2人で同じ合言葉）</label>
-      <input id="y_code" value="${esc(state.pairCode)}" placeholder="例：tokyo-love-2026" /></div>
-    <div class="field"><label>Firebase設定（firebaseConfig を貼り付け）</label>
-      <textarea id="y_cfg" placeholder='{ "apiKey":"...", "projectId":"...", ... }' style="min-height:120px;font-size:13px">${esc(state.firebaseConfig)}</textarea></div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-      <span class="sync-dot ${syncReady?'on':''}"></span>
-      <span style="font-size:13px;color:var(--sub)">${linked?(syncReady?'接続中':'接続待ち…'):'未接続'}</span>
-    </div>
-    <div class="modal-actions">
-      <button class="btn ghost" id="y_off">同期オフ</button>
-      <button class="btn primary" id="y_save">接続する</button>
-    </div>`);
-  document.getElementById('y_save').onclick=()=>{
-    state.pairCode=val('y_code'); state.firebaseConfig=val('y_cfg');
-    closeModal(); persist(); initSync(); render();
-  };
-  document.getElementById('y_off').onclick=()=>{
-    state.pairCode=''; state.firebaseConfig='';
-    closeModal(); persist(); initSync(); render();
-  };
+    <div class="note-box"><b>ペアコード</b>と<b>Firebase設定</b>を2人で同じにすると、入力した内容がリアルタイムで共有されます。設定方法はセットアップガイドへ。</div>
+    <div class="field"><label>ペアコード（2人で同じ合言葉）</label><input id="y_code" value="${esc(state.pairCode)}" placeholder="例：kyoto-love-2026"></div>
+    <div class="field"><label>Firebase設定（firebaseConfig を貼り付け）</label><textarea id="y_cfg" placeholder='{ "apiKey":"...", "projectId":"..." }' style="min-height:120px;font-size:13px">${esc(state.firebaseConfig)}</textarea></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:15px"><span class="sync-dot ${syncReady?'on':''}"></span><span style="font-size:13px;color:var(--sub)">${linked?(syncReady?'接続中':'接続待ち…'):'未接続'}</span></div>
+    <div class="modal-actions"><button class="btn ghost" id="y_off">同期オフ</button><button class="btn primary" id="y_save">接続する</button></div>`);
+  document.getElementById('y_save').onclick=()=>{ state.pairCode=val('y_code'); state.firebaseConfig=val('y_cfg'); closeModal(); persist(); initSync(); render(); };
+  document.getElementById('y_off').onclick=()=>{ state.pairCode=''; state.firebaseConfig=''; closeModal(); persist(); initSync(); render(); };
 }
 
-/* ============================================================
-   イベント
-============================================================ */
-document.getElementById('tabs').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b)return;
-  ui.tab=b.dataset.tab; render();
-});
+/* ============================================================ イベント */
+document.getElementById('chapters').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;ui.chapter=b.dataset.ch;render();window.scrollTo({top:0,behavior:'smooth'});});
 document.getElementById('fab').addEventListener('click',addModal);
 document.getElementById('btnSettings').addEventListener('click',settingsModal);
 document.getElementById('btnSync').addEventListener('click',syncModal);
-document.getElementById('btnNewTrip').addEventListener('click',()=>{
-  const name=prompt('新しい旅行の名前は？','次の旅行');
-  if(name===null) return;
-  const t=blankTrip(name||'次の旅行');
-  state.trips.push(t); state.currentTripId=t.id; save();
-});
-document.getElementById('tripSelect').addEventListener('change',e=>{
-  state.currentTripId=e.target.value; save();
-});
-document.getElementById('modalBg').addEventListener('click',e=>{
-  if(e.target.id==='modalBg') closeModal();
-});
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal();});
 
-// main 内のクリック（委譲）
 document.getElementById('main').addEventListener('click',e=>{
   const t=curTrip();
-  const like=e.target.closest('[data-like]');
-  if(like){
-    const c=t.candidates.find(x=>x.id===like.dataset.like);
-    const mi=+like.dataset.mi;
-    c.likedBy=c.likedBy||[];
-    if(c.likedBy.includes(mi)) c.likedBy=c.likedBy.filter(x=>x!==mi);
-    else c.likedBy.push(mi);
-    save(); return;
-  }
-  const pack=e.target.closest('[data-pack]');
-  if(pack && !e.target.closest('[data-del]')){
-    const p=t.packing.find(x=>x.id===pack.dataset.pack);
-    p.checked=!p.checked; save(); return;
-  }
-  const wd=e.target.closest('[data-wishdone]');
-  if(wd){ const w=t.wishlist.find(x=>x.id===wd.dataset.wishdone); w.done=!w.done; save(); return; }
-  const del=e.target.closest('[data-del]');
-  if(del){
-    const key=TYPE_KEY[del.dataset.del];
-    if(confirm('削除しますか？')){ t[key]=t[key].filter(x=>x.id!==del.dataset.id); save(); }
-    return;
-  }
-  // カードをタップして編集（リンクは除外）
-  if(e.target.closest('a')) return;
-  const ec=e.target.closest('[data-edit-type]');
-  if(ec){ openForm(ec.dataset.editType, findItem(ec.dataset.editType, ec.dataset.id)); }
+  if(e.target.closest('#goAI')){ ui.chapter='ai'; render(); window.scrollTo({top:0}); return; }
+  if(e.target.closest('#btnNewTrip')){ const n=prompt('新しい旅行の名前は？','次の旅行'); if(n===null)return; const nt=blankTrip(n||'次の旅行'); state.trips.push(nt); state.currentTripId=nt.id; save(); return; }
+  if(e.target.closest('#btnEditTrip')){ settingsModal(); return; }
+  const sel=e.target.closest('#tripSelect'); if(sel) return;
+  const like=e.target.closest('[data-like]'); if(like){ const c=t.candidates.find(x=>x.id===like.dataset.like); const mi=+like.dataset.mi; c.likedBy=c.likedBy||[]; c.likedBy=c.likedBy.includes(mi)?c.likedBy.filter(x=>x!==mi):[...c.likedBy,mi]; save(); return; }
+  const pack=e.target.closest('[data-pack]'); if(pack&&!e.target.closest('[data-del]')){ const p=t.packing.find(x=>x.id===pack.dataset.pack); p.checked=!p.checked; save(); return; }
+  const wd=e.target.closest('[data-wishdone]'); if(wd){ const w=t.wishlist.find(x=>x.id===wd.dataset.wishdone); w.done=!w.done; save(); return; }
+  const del=e.target.closest('[data-del]'); if(del){ const key=TYPE_KEY[del.dataset.del]; if(confirm('削除しますか？')){ t[key]=t[key].filter(x=>x.id!==del.dataset.id); save(); } return; }
+  if(e.target.closest('a')||e.target.closest('button')) return;
+  const ec=e.target.closest('[data-edit-type]'); if(ec){ openForm(ec.dataset.editType,findItem(ec.dataset.editType,ec.dataset.id)); }
 });
+document.getElementById('main').addEventListener('change',e=>{ const sel=e.target.closest('#tripSelect'); if(sel){ state.currentTripId=sel.value; save(); } });
+document.getElementById('modal').addEventListener('click',e=>{ const sv=e.target.closest('[data-save]'); if(sv) saveFromModal(sv.dataset.save,sv.dataset.edit||null); if(e.target.closest('[data-close]')) closeModal(); });
 
-// モーダル内の保存ボタン（委譲）
-document.getElementById('modal').addEventListener('click',e=>{
-  const sv=e.target.closest('[data-save]');
-  if(sv){ saveFromModal(sv.dataset.save, sv.dataset.edit||null); }
-  const cl=e.target.closest('[data-close]');
-  if(cl){ closeModal(); }
-});
-
-/* ============================================================
-   フォーム部品 & ユーティリティ
-============================================================ */
-function formCard(title,type,inner,editId){
-  return `<h3>${title}</h3>${inner}
-    <div class="modal-actions">
-      <button class="btn ghost" data-close>キャンセル</button>
-      <button class="btn primary" data-save="${type}" data-edit="${editId||''}">${editId?'保存':'追加'}</button>
-    </div>`;
-}
-function f(label,id,ph,type,value){ return `<div class="field"><label>${label}</label>
-  <input id="${id}" type="${type||'text'}" placeholder="${ph||''}" value="${esc(value??'')}" /></div>`; }
-function fArea(label,id,ph,value){ return `<div class="field"><label>${label}</label>
-  <textarea id="${id}" placeholder="${ph||''}">${esc(value??'')}</textarea></div>`; }
-function fDate(label,id,value){ return `<div class="field"><label>${label}</label>
-  <input id="${id}" type="date" value="${esc(value??'')}" /></div>`; }
-function fSel(label,id,opts,value){ return `<div class="field"><label>${label}</label>
-  <select id="${id}">${opts.map((o,i)=>{const v=(typeof o==='string'?o:i);
-    return `<option value="${v}" ${String(v)===String(value)?'selected':''}>${esc(o)}</option>`;}).join('')}</select></div>`; }
-
-function secTitle(t,hint){ return `<div class="sec-title"><h2>${t}</h2><span class="hint">${hint||''}</span></div>`; }
-function empty(em,t,s){ return `<div class="empty"><span class="em">${em}</span><b>${t}</b><br><span style="font-size:13px">${s}</span></div>`; }
-function linkHtml(url){ if(!url)return''; const u=/^https?:\/\//.test(url)?url:'https://'+url;
-  return `<a class="link" href="${esc(u)}" target="_blank" rel="noopener">🔗 リンクを開く</a>`; }
-
+/* ============================================================ 部品 / utils */
+function card(title,type,inner,editId){ return `<h3>${title}</h3>${inner}<div class="modal-actions"><button class="btn ghost" data-close>キャンセル</button><button class="btn rose" data-save="${type}" data-edit="${editId||''}">${editId?'保存':'追加'}</button></div>`; }
+function f(l,id,ph,type,v){ return `<div class="field"><label>${l}</label><input id="${id}" type="${type||'text'}" placeholder="${ph||''}" value="${esc(v??'')}"></div>`; }
+function fA(l,id,ph,v){ return `<div class="field"><label>${l}</label><textarea id="${id}" placeholder="${ph||''}">${esc(v??'')}</textarea></div>`; }
+function fD(l,id,v){ return `<div class="field"><label>${l}</label><input id="${id}" type="date" value="${esc(v??'')}"></div>`; }
+function fS(l,id,opts,v){ return `<div class="field"><label>${l}</label><select id="${id}">${opts.map((o,i)=>{const x=(typeof o==='string'?o:i);return `<option value="${x}" ${String(x)===String(v)?'selected':''}>${esc(o)}</option>`;}).join('')}</select></div>`; }
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function yen(n){ return Math.round(n).toLocaleString('ja-JP'); }
-function daysUntil(d){ const t=new Date(d+'T00:00:00'); const now=new Date(); now.setHours(0,0,0,0);
-  return Math.round((t-now)/86400000); }
-function fmtDay(d){ const dt=new Date(d+'T00:00:00'); const w=['日','月','火','水','木','金','土'][dt.getDay()];
-  return `${dt.getMonth()+1}月${dt.getDate()}日(${w})`; }
-function fmtRange(s,e){ if(!s)return''; if(!e||e===s)return fmtShort(s); return `${fmtShort(s)}〜${fmtShort(e)}`; }
-function fmtShort(d){ const dt=new Date(d+'T00:00:00'); return `${dt.getMonth()+1}/${dt.getDate()}`; }
-function fmtDateTime(dt){ try{ const d=new Date(dt); const w=['日','月','火','水','木','金','土'][d.getDay()];
-  return `${d.getMonth()+1}/${d.getDate()}(${w}) ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-}catch(e){return dt;} }
+function daysUntil(d){ const x=new Date(d+'T00:00:00'); const n=new Date(); n.setHours(0,0,0,0); return Math.round((x-n)/86400000); }
+function addDays(d,n){ const x=new Date(d+'T00:00:00'); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); }
+function fmtDay(d){ const dt=new Date(d+'T00:00:00'); const w=['日','月','火','水','木','金','土'][dt.getDay()]; return `${dt.getMonth()+1}月${dt.getDate()}日（${w}）`; }
+function fmtRangeLong(s,e){ if(!s)return''; const a=new Date(s+'T00:00:00'); if(!e||e===s) return `${a.getFullYear()}.${a.getMonth()+1}.${a.getDate()}`;
+  const b=new Date(e+'T00:00:00'); return `${a.getFullYear()}.${a.getMonth()+1}.${a.getDate()} – ${b.getMonth()+1}.${b.getDate()}`; }
+function fmtDateTime(dt){ try{ const d=new Date(dt); const w=['日','月','火','水','木','金','土'][d.getDay()]; return `${d.getMonth()+1}/${d.getDate()}（${w}）${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }catch(e){ return dt; } }
 
-/* ============================================================
-   起動
-============================================================ */
-render();
-initSync();
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
-}
+/* ============================================================ 起動 */
+render(); initSync();
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
