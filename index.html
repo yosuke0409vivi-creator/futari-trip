@@ -222,26 +222,26 @@ import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/f
 
 const CHAPTERS=[
   {id:'cover',label:'表紙'},{id:'cand',label:'候補地'},{id:'plan',label:'しおり'},
-  {id:'money',label:'予算'},{id:'pack',label:'持ち物'},{id:'resv',label:'予約'},{id:'ai',label:'✨相談',ai:true},
+  {id:'money',label:'予算'},{id:'pack',label:'持ち物'},{id:'resv',label:'予約'},
 ];
 const TYPE_KEY={money:'expenses',pack:'packing',resv:'reservations'};
 const CLIENT_ID=Math.random().toString(36).slice(2);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const CAT_FACE='neko-face.png', CAT_FULL='neko-mascot.png';
 
-let ui={chapter:'cover',chat:[],openDest:null,suggest:null};
+let ui={chapter:'cover',openDest:null};
 let db=null,unsub=null,syncReady=false,saveTimer=null;
 
 function blankTrip(title){ return {id:uid(),title:title||'はじめての旅行',destination:'',startDate:'',endDate:'',
   candidates:[],itinerary:[],expenses:[],packing:[],reservations:[]}; }
-function blankDest(name){ return {id:uid(),name:name||'',area:'',note:'',url:'',likedBy:[],spots:[],foods:[]}; }
+function blankDest(name){ return {id:uid(),name:name||'',area:'',note:'',url:'',likedBy:[],spots:[],foods:[],stays:[]}; }
 function defaultState(){ const t=blankTrip('はじめての旅行');
   return {trips:[t],currentTripId:t.id,members:['わたし','パートナー'],me:0,
-    pairCode:'',firebaseConfig:'',geminiKey:'',geminiModel:'gemini-2.0-flash',mapsKey:'',updatedAt:0}; }
+    pairCode:'',firebaseConfig:'',mapsKey:'',updatedAt:0}; }
 function migrate(s){
   s.trips.forEach(t=>{
     t.candidates=t.candidates||[];
-    t.candidates.forEach(c=>{ c.spots=c.spots||[]; c.foods=c.foods||[]; c.likedBy=c.likedBy||[]; });
+    t.candidates.forEach(c=>{ c.spots=c.spots||[]; c.foods=c.foods||[]; c.stays=c.stays||[]; c.likedBy=c.likedBy||[]; });
     // 旧「行きたい」を候補地に移行
     if(t.wishlist&&t.wishlist.length){
       let dest=t.candidates[0]; if(!dest){ dest=blankDest('行きたいリスト'); t.candidates.push(dest); }
@@ -254,7 +254,7 @@ function migrate(s){
 function loadState(){ try{ let s=JSON.parse(localStorage.getItem('futari-trip'));
   if(!s||!s.trips||!s.trips.length) return defaultState();
   s.members=s.members||['わたし','パートナー']; if(typeof s.me!=='number') s.me=0;
-  s.geminiModel=s.geminiModel||'gemini-2.0-flash'; s.geminiKey=s.geminiKey||''; s.mapsKey=s.mapsKey||'';
+  s.mapsKey=s.mapsKey||'';
   return migrate(s);
 }catch(e){ return defaultState(); } }
 let state=loadState();
@@ -264,7 +264,7 @@ function curTrip(){ return state.trips.find(t=>t.id===state.currentTripId)||stat
 function getDest(id){ return curTrip().candidates.find(c=>c.id===id); }
 
 /* ===== 同期（端末ローカルの鍵は送らない） ===== */
-function cloudPayload(){ return JSON.stringify({...state,geminiKey:'',mapsKey:'',firebaseConfig:'',pairCode:'',me:0}); }
+function cloudPayload(){ return JSON.stringify({...state,mapsKey:'',firebaseConfig:'',pairCode:'',me:0}); }
 function initSync(){ if(unsub){unsub();unsub=null;} syncReady=false;db=null;updateSyncDot();
   if(!state.firebaseConfig||!state.pairCode) return;
   let cfg; try{cfg=JSON.parse(state.firebaseConfig);}catch(e){updateSyncDot('err');return;}
@@ -273,7 +273,7 @@ function initSync(){ if(unsub){unsub();unsub=null;} syncReady=false;db=null;upda
     unsub=onSnapshot(ref,snap=>{ syncReady=true;updateSyncDot('on'); const data=snap.data();
       if(data&&data.payload){ try{ const remote=JSON.parse(data.payload);
         if(remote.updatedAt>(state.updatedAt||0)&&data.by!==CLIENT_ID){
-          const k={me:state.me,pairCode:state.pairCode,firebaseConfig:state.firebaseConfig,geminiKey:state.geminiKey,geminiModel:state.geminiModel,mapsKey:state.mapsKey};
+          const k={me:state.me,pairCode:state.pairCode,firebaseConfig:state.firebaseConfig,mapsKey:state.mapsKey};
           state=migrate(remote); Object.assign(state,k); localStorage.setItem('futari-trip',JSON.stringify(state)); render();
         }}catch(e){} }
     },err=>updateSyncDot('err'));
@@ -311,11 +311,9 @@ function renderMain(){ const t=curTrip();
   else if(ui.chapter==='money') html=renderMoney(t);
   else if(ui.chapter==='pack') html=renderPack(t);
   else if(ui.chapter==='resv') html=renderResv(t);
-  else if(ui.chapter==='ai') html=renderAI(t);
   document.getElementById('main').innerHTML=html;
   const inDetail = ui.chapter==='cand'&&ui.openDest;
   document.getElementById('fab').style.display = (['plan','money','pack','resv'].includes(ui.chapter)||(ui.chapter==='cand'&&!ui.openDest))?'flex':'none';
-  if(ui.chapter==='ai') wireAI();
   if(inDetail) wireDetail();
 }
 
@@ -324,7 +322,7 @@ function renderCover(t){
   let cd; if(t.startDate){ const d=daysUntil(t.startDate); const big=d>0?d:(d===0?'本日':Math.abs(d)); const lbl=d>0?'日後に出発':(d===0?'いってらっしゃい':'日前の旅');
     cd=`<div class="cd"><span class="n">${big}</span><span class="l">${lbl}</span></div>`;
   } else cd=`<div class="cd"><span class="l" style="color:var(--sub)">行き先と日程で<br>カウントダウン開始</span></div>`;
-  const spots=t.candidates.reduce((s,c)=>s+c.spots.length+c.foods.length,0);
+  const spots=t.candidates.reduce((s,c)=>s+c.spots.length+c.foods.length+(c.stays?c.stays.length:0),0);
   const opts=state.trips.map(x=>`<option value="${x.id}" ${x.id===state.currentTripId?'selected':''}>${esc(x.title)}</option>`).join('');
   return `<div class="cover"><div class="band">
       <div class="kicker">Travel Journal</div><h1>${esc(t.title)}</h1>
@@ -334,12 +332,12 @@ function renderCover(t){
     <div class="rule"></div>
     <div class="summary">
       <div class="s"><div class="n">${t.candidates.length}</div><div class="l">候補地</div></div>
-      <div class="s"><div class="n">${spots}</div><div class="l">行きたい/食べたい</div></div>
+      <div class="s"><div class="n">${spots}</div><div class="l">行きたい/食/泊</div></div>
       <div class="s"><div class="n">${t.itinerary.length}</div><div class="l">予定</div></div>
       <div class="s"><div class="n">${t.reservations.length}</div><div class="l">予約</div></div>
     </div>
     <div class="cover-actions">
-      <button class="btn-ai" id="goAI"><img src="${CAT_FACE}" alt="">AIコンシェルジュに相談する</button>
+      <button class="btn-ai" id="goImport"><img src="${CAT_FACE}" alt="">Claude Codeの旅程を取り込む</button>
       <div class="cover-meta"><select id="tripSelect">${opts}</select>
         <button class="mini" id="btnNewTrip">＋</button><button class="mini" id="btnEditTrip">✎</button></div>
     </div></div>`;
@@ -382,18 +380,10 @@ function renderDestDetail(t,c){
         <div class="actions" style="margin-top:4px">${state.members.map((nm,i)=>{const on=liked.includes(i);
           return `<button class="chip-link ${on?'map':''}" data-dlike="${i}">${on?'❤︎':'♡'} ${esc(nm)}</button>`;}).join('')}</div>
       </div></div>
-
-    <div class="ai-box">
-      <div class="h"><img src="${CAT_FACE}">AIにおすすめを聞く</div>
-      <textarea id="destReq" placeholder="例：2人でのんびり、甘いものとレトロ喫茶が好き、自然も少し"></textarea>
-      <button class="go" id="destSuggest">${esc(c.name||'この候補地')}のおすすめを提案してもらう</button>
-    </div>
-    <div id="suggArea"></div>
-
+    <div class="note-box" style="margin-top:14px">🐾 行きたい/食べたい/泊まりたいを集める場所です。<b>Claude Code（チャットの私）に相談</b>すると、ここに入る旅程コードをお渡しします → 表紙の「取り込む」で一気に反映（写真は自動）。もちろん手入力もOK。</div>
     ${listSection('🏞 行きたい場所','spots',c)}
     ${listSection('🍽 食べたいもの','foods',c)}
-
-    <button class="btn rose" id="makePlan" style="width:100%;margin-top:18px">📋 ここからAIがしおりを作る</button>`;
+    ${listSection('🛏 泊まりたい場所','stays',c)}`;
   return h;
 }
 function listSection(title,key,c){
@@ -412,71 +402,58 @@ function listSection(title,key,c){
   return h;
 }
 
-/* ---------- AI提案 / しおり生成（候補地内） ---------- */
+/* ---------- 候補地詳細の操作 ---------- */
 function wireDetail(){
   const c=getDest(ui.openDest); if(!c) return;
-  document.getElementById('destBack').onclick=()=>{ ui.openDest=null; ui.suggest=null; render(); window.scrollTo({top:0}); };
+  document.getElementById('destBack').onclick=()=>{ ui.openDest=null; render(); window.scrollTo({top:0}); };
   document.getElementById('destEdit').onclick=()=>openForm('dest',c);
-  document.getElementById('destSuggest').onclick=()=>suggestForDest(c);
-  document.getElementById('makePlan').onclick=()=>makeItineraryFromDest(c);
   document.querySelectorAll('[data-dlike]').forEach(b=>b.onclick=()=>{ const mi=+b.dataset.dlike;
     c.likedBy=c.likedBy||[]; c.likedBy=c.likedBy.includes(mi)?c.likedBy.filter(x=>x!==mi):[...c.likedBy,mi]; save(); });
   document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>openForm(b.dataset.add,null,{destId:c.id,key:b.dataset.add}));
-  // 提案エリア再描画
-  if(ui.suggest&&ui.suggest.destId===c.id) renderSuggest();
 }
-async function suggestForDest(c){
-  if(!state.geminiKey){ alert('AIを使うには⚙️設定でGemini APIキーを登録してください'); settingsModal(); return; }
-  const req=(document.getElementById('destReq')?.value||'').trim();
-  const area=document.getElementById('suggArea'); area.innerHTML=`<div class="loading"><span class="spinner"></span> ${esc(c.name)}のおすすめを考えています…</div>`;
-  const schema={type:'object',properties:{suggestions:{type:'array',items:{type:'object',properties:{
-    name:{type:'string'},area:{type:'string'},reason:{type:'string'},kind:{type:'string'}},required:['name','kind']}}},required:['suggestions']};
-  try{
-    const raw=await geminiGenerate(`恋人2人の旅行先「${c.name}${c.area?('（'+c.area+'）'):''}」で、行きたい場所(kind:"spot")と食べたいもの・お店(kind:"food")を合計8件ほど提案。\n要望：${req||'王道＋少し穴場、2人で楽しめるもの'}\nnameは地図検索できる実在の正式名称。reasonは20字程度の一言。`,schema);
-    const data=JSON.parse(raw);
-    ui.suggest={destId:c.id, items:(data.suggestions||[]).map(s=>({...s,id:uid(),photo:undefined,added:false}))};
-    renderSuggest();
-  }catch(e){ area.innerHTML=`<div class="note-box">提案に失敗しました🙇 ${esc(e.message)}</div>`; }
+
+/* ---------- 取り込み / 書き出し（Claude Code連携） ---------- */
+function b64enc(s){ return btoa(unescape(encodeURIComponent(s))); }
+function b64dec(b){ return decodeURIComponent(escape(atob(b))); }
+function exportTrip(t){ return {title:t.title,destination:t.destination,startDate:t.startDate,endDate:t.endDate,
+  candidates:t.candidates.map(c=>({name:c.name,area:c.area,note:c.note,url:c.url,
+    spots:(c.spots||[]).map(x=>({name:x.name,area:x.area,note:x.note,url:x.url})),
+    foods:(c.foods||[]).map(x=>({name:x.name,area:x.area,note:x.note,url:x.url})),
+    stays:(c.stays||[]).map(x=>({name:x.name,area:x.area,note:x.note,url:x.url}))})),
+  itinerary:t.itinerary.map(x=>({day:x.day,time:x.time,title:x.title,place:x.place,note:x.note})),
+  packing:t.packing.map(x=>({name:x.name,category:x.category})),
+  expenses:t.expenses.map(x=>({title:x.title,amount:x.amount,paidBy:x.paidBy,category:x.category,date:x.date,splitWith:x.splitWith}))}; }
+function parsePayload(text){ text=(text||'').trim(); if(!text) return null; let s=text;
+  if(s[0]!=='{'){ try{ s=b64dec(s.replace(/\s+/g,'')); }catch(e){} } try{ return JSON.parse(s); }catch(e){ return null; } }
+function fillTrip(t,p){
+  (p.candidates||[]).forEach(c=>{ const d=blankDest(c.name); d.area=c.area||''; d.note=c.note||''; d.url=c.url||'';
+    ['spots','foods','stays'].forEach(k=>{ (c[k]||[]).forEach(x=>d[k].push({id:uid(),name:x.name||'',area:x.area||'',note:x.note||'',url:x.url||'',photo:undefined})); });
+    t.candidates.push(d); });
+  (p.itinerary||[]).forEach(it=>{ let day=it.day; if(typeof day==='number') day=t.startDate?addDays(t.startDate,day-1):''; else if(it.dayNo&&t.startDate) day=addDays(t.startDate,it.dayNo-1); else day=day||'';
+    t.itinerary.push({id:uid(),day,time:it.time||'',title:it.title||'',place:it.place||'',note:it.note||'',url:it.url||''}); });
+  (p.packing||[]).forEach(x=>t.packing.push({id:uid(),name:x.name||'',category:x.category||'その他',checked:false}));
+  (p.expenses||[]).forEach(x=>t.expenses.push({id:uid(),title:x.title||'',amount:+x.amount||0,paidBy:x.paidBy??0,category:x.category||'',date:x.date||'',splitWith:x.splitWith||[0,1]}));
 }
-function renderSuggest(){
-  const area=document.getElementById('suggArea'); if(!area||!ui.suggest) return;
-  const c=getDest(ui.suggest.destId); if(!c){ area.innerHTML=''; return; }
-  area.innerHTML=`<div class="sec-title">🐾 コンシェルジュのおすすめ<button class="add" id="suggClear">閉じる</button></div>`+
-    ui.suggest.items.map((s,i)=>{ if(s.photo===undefined) maybeSuggPhoto(s,(s.name||'')+' '+(s.area||c.name||''));
-      const isFood=s.kind==='food';
-      return `<div class="sugg-card">
-        ${s.photo?`<img class="ph" src="${s.photo}" onerror="this.outerHTML='<div class=&quot;ph-ph&quot;><img src=&quot;${CAT_FACE}&quot;></div>'">`:`<div class="ph-ph"><img src="${CAT_FACE}"></div>`}
-        <div class="b"><div class="nm">${isFood?'🍽 ':'🏞 '}${esc(s.name)}</div>
-          ${s.area?`<div class="rs">${esc(s.area)}</div>`:''}${s.reason?`<div class="rs">${esc(s.reason)}</div>`:''}
-          <button class="add ${s.added?'done':''}" data-sugg="${i}">${s.added?'追加済み ✓':(isFood?'食べたいに追加':'行きたいに追加')}</button>
-        </div></div>`;}).join('');
-  document.getElementById('suggClear').onclick=()=>{ ui.suggest=null; renderMain(); };
-  area.querySelectorAll('[data-sugg]').forEach(b=>b.onclick=()=>addSuggestion(+b.dataset.sugg));
+function doImport(text,mode){ const p=parsePayload(text); const tr=p&&(p.trip||p);
+  if(!tr||!(tr.candidates||tr.itinerary||tr.title)){ alert('うまく読み取れませんでした🙇 Claude Codeが渡したコードをそのまま貼り付けてください。'); return; }
+  if(mode==='new'){ const t=blankTrip(tr.title||'取り込んだ旅行'); t.destination=tr.destination||''; t.startDate=tr.startDate||''; t.endDate=tr.endDate||''; fillTrip(t,tr); state.trips.push(t); state.currentTripId=t.id; }
+  else { const t=curTrip(); if(tr.destination&&!t.destination) t.destination=tr.destination; if(tr.startDate&&!t.startDate){ t.startDate=tr.startDate; t.endDate=tr.endDate||t.endDate; } fillTrip(t,tr); }
+  ui.chapter='cover'; ui.openDest=null; closeModal(); save(); setTimeout(()=>alert('取り込みました🐾 写真は順番に読み込まれます'),60);
 }
-function maybeSuggPhoto(s,q){ if(!state.mapsKey||s.photo!==undefined||s._pf) return; s._pf=true;
-  fetchPhoto(q).then(u=>{ s.photo=u||null; renderSuggest(); }); }
-function addSuggestion(i){ const c=getDest(ui.suggest.destId); const s=ui.suggest.items[i]; if(!c||!s||s.added) return;
-  const list=s.kind==='food'?c.foods:c.spots;
-  list.push({id:uid(),name:s.name,area:s.area||'',note:s.reason||'',url:'',photo:s.photo});
-  s.added=true; persist(); renderMain(); }
-async function makeItineraryFromDest(c){
-  const all=[...c.spots.map(x=>({...x,kind:'spot'})),...c.foods.map(x=>({...x,kind:'food'}))];
-  if(!all.length){ alert('先に「行きたい場所」「食べたいもの」を追加してください（AI提案からでもOK）'); return; }
-  if(!state.geminiKey){ alert('しおり作成にはGemini APIキーが必要です'); settingsModal(); return; }
-  const t=curTrip(); const btn=document.getElementById('makePlan'); btn.innerHTML='<span class="spinner"></span> しおりを作成中…';
-  const schema={type:'object',properties:{days:{type:'array',items:{type:'object',properties:{
-    day:{type:'integer'},items:{type:'array',items:{type:'object',properties:{time:{type:'string'},title:{type:'string'},place:{type:'string'},note:{type:'string'}},required:['title']}}},required:['day','items']}}},required:['days']};
-  try{
-    const list=all.map(x=>`${x.kind==='food'?'[食]':'[所]'}${x.name}${x.area?('（'+x.area+'）'):''}`).join('、');
-    const nights=t.startDate&&t.endDate?Math.max(1,daysBetween(t.startDate,t.endDate)):'';
-    const raw=await geminiGenerate(`「${c.name}」での恋人2人の旅行のモデルコースを日本語で作成。\n${nights?('日数：'+(nights+1)+'日（'+nights+'泊）'):'1〜2日'}\n以下を無理なく回れる順路・時間で日程化。食事は食べたいものを活用。\n候補：${list}\ntimeは"10:00"形式、placeは地図検索できる正式名称。`,schema);
-    const data=JSON.parse(raw); let n=0;
-    (data.days||[]).forEach(d=>{ const day=t.startDate?addDays(t.startDate,d.day-1):'';
-      (d.items||[]).forEach(it=>{ t.itinerary.push({id:uid(),day,time:it.time||'',title:it.title||'',place:it.place||'',note:it.note||'',url:''}); n++; }); });
-    ui.chapter='plan'; ui.openDest=null; save();
-    setTimeout(()=>alert(`${esc(c.name)}のしおりに ${n} 件の予定を追加しました🐾`),60);
-  }catch(e){ btn.textContent='📋 ここからAIがしおりを作る'; alert('しおり作成に失敗しました🙇 '+e.message); }
+function importModal(prefill){
+  openModal(`<h3>📥 旅程の取り込み / 書き出し</h3>
+    <div class="note-box">Claude Code（このチャットの私）に旅程を作ってもらい、もらった<b>コード</b>を下に貼って「取り込む」。逆に、いまの内容を私に見せたいときは「書き出す」でコピーし、チャットに貼ってください。</div>
+    <div class="field"><label>旅程コード（JSONでもOK）</label><textarea id="imp_text" style="min-height:120px;font-size:12px" placeholder="ここに貼り付け">${esc(prefill||'')}</textarea></div>
+    <div class="modal-actions"><button class="btn ghost" id="imp_export">📤 今の旅行を書き出してコピー</button></div>
+    <div class="modal-actions" style="margin-top:10px"><button class="btn rose" id="imp_new">新しい旅行として取り込む</button><button class="btn primary" id="imp_merge">今の旅行に追加</button></div>`);
+  document.getElementById('imp_export').onclick=()=>{ const out=JSON.stringify({v:1,trip:exportTrip(curTrip())});
+    document.getElementById('imp_text').value=out; try{ navigator.clipboard.writeText(out); }catch(e){} alert('今の旅行を書き出してコピーしました。チャットに貼り付けてください。'); };
+  document.getElementById('imp_new').onclick=()=>doImport(document.getElementById('imp_text').value,'new');
+  document.getElementById('imp_merge').onclick=()=>doImport(document.getElementById('imp_text').value,'merge');
 }
+function checkImportHash(){ const m=location.hash.match(/[#&]import=([^&]+)/); if(!m) return;
+  let code; try{ code=decodeURIComponent(m[1]); }catch(e){ code=m[1]; }
+  history.replaceState(null,'',location.pathname+location.search); setTimeout(()=>importModal(code),200); }
 
 /* ---------- しおり ---------- */
 function renderPlan(t){
@@ -539,41 +516,6 @@ function renderResv(t){
   return h;
 }
 
-/* ---------- 全体AIコンシェルジュ ---------- */
-function renderAI(t){
-  if(!state.geminiKey) return `<div class="ai-intro"><div class="catwrap"><img src="${CAT_FULL}" style="width:100%"></div>
-    <h2>AIコンシェルジュ</h2><p>旅の相談や全体プランの作成をお手伝いします。</p></div>
-    <div class="note-box">使うには無料のGemini APIキーが必要です（月額契約とは別）。設定方法はセットアップガイドへ。</div>
-    <button class="btn rose" id="aiToSettings" style="width:100%">⚙️ 設定でGeminiキーを登録</button>`;
-  const chat=ui.chat.map(m=>m.role==='me'?`<div class="ai-bubble me">${esc(m.text)}</div>`
-    :`<div class="ai-bubble cat"><div class="who"><img src="${CAT_FACE}">コンシェルジュ</div>${m.html||esc(m.text)}</div>`).join('');
-  return `<div class="chap-head"><div class="idx">Concierge</div><h2>AIコンシェルジュ</h2><p>${esc(t.destination||t.title)} の旅を一緒に考えます</p></div>
-    <div class="ai-quick"><button data-quick="food">🍽 グルメのおすすめ</button><button data-quick="rain">☔️ 雨の日プラン</button><button data-quick="souvenir">🎁 おみやげ</button></div>
-    <div id="chatLog">${chat||`<div class="ai-bubble cat"><div class="who"><img src="${CAT_FACE}">コンシェルジュ</div>こんにちは。${esc(t.destination||'行き先')}の旅、なんでも相談してください。各「候補地」を開くと、その場所のおすすめ提案やしおり作成もできます🐾</div>`}</div>
-    <div class="field" style="margin-top:12px"><textarea id="aiInput" placeholder="例：京都で2人にぴったりの夜ごはんは？"></textarea></div>
-    <button class="btn primary" id="aiAsk" style="width:100%">💬 相談する</button>`;
-}
-function wireAI(){ const ts=document.getElementById('aiToSettings'); if(ts) ts.onclick=settingsModal;
-  document.querySelectorAll('[data-quick]').forEach(b=>b.onclick=()=>doAsk({food:'おすすめのグルメ・カフェを教えて',rain:'雨の日でも楽しめるプランを教えて',souvenir:'2人で買って帰りたいおみやげは？'}[b.dataset.quick]));
-  const aq=document.getElementById('aiAsk'); if(aq) aq.onclick=()=>doAsk((document.getElementById('aiInput')?.value||'').trim()); }
-function tripContext(){ const t=curTrip(); let c=`行き先:${t.destination||t.title}`;
-  if(t.startDate) c+=` / 日程:${t.startDate}〜${t.endDate||t.startDate}`;
-  if(t.candidates.length) c+=` / 候補地:${t.candidates.map(x=>x.name).join('、')}`; return c; }
-async function doAsk(text){ if(!text) return; ui.chat.push({role:'me',text}); render();
-  const log=document.getElementById('chatLog'); const b=document.createElement('div'); b.className='ai-bubble cat'; b.id='busy';
-  b.innerHTML=`<div class="who"><img src="${CAT_FACE}">コンシェルジュ</div><span class="spinner"></span> 考え中…`; log.appendChild(b); b.scrollIntoView({behavior:'smooth'});
-  try{ const out=await geminiGenerate(`あなたは恋人どうしの旅行を手伝う、やさしい猫のコンシェルジュです。絵文字を少し交え簡潔に。\n旅行情報：${tripContext()}\n相談：${text}`);
-    ui.chat.push({role:'cat',text:out}); render();
-  }catch(e){ ui.chat.push({role:'cat',text:'うまく取得できませんでした🙇 '+e.message}); render(); } }
-
-/* ===== Gemini ===== */
-async function geminiGenerate(prompt,schema){ const model=state.geminiModel||'gemini-2.0-flash';
-  const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-  const body={contents:[{parts:[{text:prompt}]}]};
-  if(schema) body.generationConfig={responseMimeType:'application/json',responseSchema:schema};
-  const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':state.geminiKey},body:JSON.stringify(body)});
-  if(!res.ok){ const tx=await res.text(); throw new Error('Gemini '+res.status+'：'+tx.slice(0,160)); }
-  const data=await res.json(); return (data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join(''); }
 
 /* ===== モーダル / フォーム ===== */
 function openModal(html){ document.getElementById('modal').innerHTML='<div class="grip"></div>'+html; document.getElementById('modalBg').classList.add('show'); }
@@ -590,6 +532,7 @@ function openForm(type,item,ctx){
     dest:()=>card(item?'候補地を編集':'候補地を追加','dest',`${f('行き先の名前','d_name','例：京都',null,d.name)}${f('エリア / 地域','d_area','例：京都府',null,d.area)}${fA('メモ','d_note','この場所への想いなど',d.note)}${f('リンク (URL)','d_url','',null,d.url)}`,ed),
     spots:()=>card(item?'行きたい場所を編集':'行きたい場所を追加','spots',`${f('場所の名前','i_name','例：清水寺',null,d.name)}${f('エリア','i_area','',null,d.area)}${fA('メモ','i_note','',d.note)}${f('リンク (URL)','i_url','',null,d.url)}`,ed,ctxAttr),
     foods:()=>card(item?'食べたいものを編集':'食べたいものを追加','foods',`${f('お店・料理の名前','i_name','例：％アラビカ／湯豆腐',null,d.name)}${f('エリア','i_area','',null,d.area)}${fA('メモ','i_note','',d.note)}${f('リンク (URL)','i_url','',null,d.url)}`,ed,ctxAttr),
+    stays:()=>card(item?'泊まりたい場所を編集':'泊まりたい場所を追加','stays',`${f('宿・エリアの名前','i_name','例：◯◯温泉の旅館／祇園に泊まりたい',null,d.name)}${f('エリア','i_area','',null,d.area)}${fA('メモ','i_note','料金感・希望など',d.note)}${f('リンク (URL)','i_url','',null,d.url)}`,ed,ctxAttr),
     plan:()=>card(item?'予定を編集':'予定を追加','plan',`${fD('日付','p_day',d.day)}${f('時間','p_time','例：10:00','time',d.time)}${f('予定','p_title','例：清水寺を観光',null,d.title)}${f('場所','p_place','',null,d.place)}${fA('メモ','p_note','',d.note)}${f('リンク (URL)','p_url','',null,d.url)}`,ed),
     money:()=>card(item?'支出を編集':'支出を追加','money',`${f('内容','m_title','例：ホテル代',null,d.title)}${f('金額 (円)','m_amount','例：12000','number',d.amount)}${fS('支払った人','m_paid',state.members,d.paidBy??0)}${fS('カテゴリ','m_cat',['宿泊','交通','食事','観光・入場','買い物','その他'],d.category)}${fD('日付','m_date',d.date)}<div class="field"><label>割り勘の対象</label><div class="seg" id="m_split"><button type="button" data-split="both" class="${splitVal==='both'?'on':''}">2人で割る</button><button type="button" data-split="0" class="${splitVal==='0'?'on':''}">${esc(state.members[0])}だけ</button><button type="button" data-split="1" class="${splitVal==='1'?'on':''}">${esc(state.members[1])}だけ</button></div></div>`,ed),
     pack:()=>card(item?'持ち物を編集':'持ち物を追加','pack',`${f('持ち物の名前','k_name','例：充電器',null,d.name)}${fS('カテゴリ','k_cat',['身の回り','衣類','洗面・コスメ','ガジェット','書類・お金','その他'],d.category)}${item?'':'<div class="note-box" id="packPreset" style="cursor:pointer">📦 タップで「旅行の基本セット」をまとめて追加</div>'}`,ed),
@@ -605,7 +548,7 @@ function saveFromModal(type,editId,ctx){
     const obj={name:val('d_name'),area:val('d_area'),note:val('d_note'),url:val('d_url')};
     if(old){ Object.assign(old,obj); old.photo=undefined; old._pf=false; } else arr.push(Object.assign(blankDest(),obj));
     closeModal(); save(); return; }
-  if(type==='spots'||type==='foods'){
+  if(type==='spots'||type==='foods'||type==='stays'){
     if(!val('i_name'))return;
     const [destId,key]=(ctx||'').split('|'); const dest=getDest(destId)||getDest(ui.openDest); if(!dest){closeModal();return;}
     const arr=dest[type]; const old=editId?arr.find(x=>x.id===editId):null;
@@ -636,15 +579,13 @@ function settingsModal(){ const t=curTrip();
     <div class="field"><label>行き先（決定したら）</label><input id="s_dest" value="${esc(t.destination)}" placeholder="例：京都"></div>
     <div class="field"><label>日程</label><div class="two"><input id="s_start" type="date" value="${t.startDate}"><input id="s_end" type="date" value="${t.endDate}"></div></div>
     <hr style="border:none;border-top:1px solid var(--line);margin:18px 0">
-    <div class="field"><label>✨ Gemini APIキー（AI相談・提案・しおり生成）</label><input id="s_gkey" value="${esc(state.geminiKey)}" placeholder="AIza... を貼り付け"></div>
-    <div class="field"><label>Geminiモデル</label><input id="s_gmodel" value="${esc(state.geminiModel)}" placeholder="gemini-2.0-flash"></div>
-    <div class="field"><label>🗺 Google Maps/Places APIキー（写真用）</label><input id="s_mkey" value="${esc(state.mapsKey)}" placeholder="AIza... を貼り付け"></div>
-    <div class="note-box">2つのキーはこの端末だけに保存し、クラウド同期には含めません。取得方法はセットアップガイドへ。相手の端末でも使うなら同じ手順で登録してください。</div>
+    <div class="field"><label>🗺 Google Maps/Places APIキー（おすすめの写真用・任意）</label><input id="s_mkey" value="${esc(state.mapsKey)}" placeholder="AIza... を貼り付け"></div>
+    <div class="note-box">写真を出すためのキーです（無くても猫のプレースホルダーで動きます）。この端末だけに保存し、クラウド同期には含めません。取得方法はセットアップガイドへ。</div>
     <div class="modal-actions"><button class="btn ghost" id="s_delTrip">旅行を削除</button><button class="btn primary" id="s_save">保存</button></div>`);
   document.getElementById('s_me').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...e.currentTarget.children].forEach(x=>x.classList.remove('on'));b.classList.add('on');});
   document.getElementById('s_save').onclick=()=>{ state.members=[val('s_m0')||'わたし',val('s_m1')||'パートナー']; state.me=+document.querySelector('#s_me .on').dataset.me;
     t.title=val('s_title')||t.title; t.destination=val('s_dest'); t.startDate=val('s_start'); t.endDate=val('s_end');
-    state.geminiKey=val('s_gkey'); state.geminiModel=val('s_gmodel')||'gemini-2.0-flash'; state.mapsKey=val('s_mkey'); closeModal(); save(); };
+    state.mapsKey=val('s_mkey'); closeModal(); save(); };
   document.getElementById('s_delTrip').onclick=()=>{ if(state.trips.length<=1){alert('最後の1つは削除できません');return;} if(!confirm('この旅行を削除しますか？'))return;
     state.trips=state.trips.filter(x=>x.id!==state.currentTripId); state.currentTripId=state.trips[0].id; ui.chapter='cover'; ui.openDest=null; closeModal(); save(); };
 }
@@ -666,11 +607,11 @@ document.getElementById('btnSync').addEventListener('click',syncModal);
 document.getElementById('modalBg').addEventListener('click',e=>{if(e.target.id==='modalBg')closeModal();});
 
 document.getElementById('main').addEventListener('click',e=>{ const t=curTrip();
-  if(e.target.closest('#goAI')){ ui.chapter='ai'; render(); window.scrollTo({top:0}); return; }
+  if(e.target.closest('#goImport')){ importModal(); return; }
   if(e.target.closest('#btnNewTrip')){ const n=prompt('新しい旅行の名前は？','次の旅行'); if(n===null)return; const nt=blankTrip(n||'次の旅行'); state.trips.push(nt); state.currentTripId=nt.id; ui.chapter='cover'; save(); return; }
   if(e.target.closest('#btnEditTrip')){ settingsModal(); return; }
   // 候補地を開く
-  const op=e.target.closest('[data-open]'); if(op){ ui.openDest=op.dataset.open; ui.suggest=null; render(); window.scrollTo({top:0}); return; }
+  const op=e.target.closest('[data-open]'); if(op){ ui.openDest=op.dataset.open; render(); window.scrollTo({top:0}); return; }
   // 詳細内：場所/食べ物の編集・削除
   const delK=e.target.closest('[data-del]'); if(delK){ const c=getDest(ui.openDest); const key=delK.dataset.del; if(c&&confirm('削除しますか？')){ c[key]=c[key].filter(x=>x.id!==delK.dataset.id); save(); } return; }
   const edK=e.target.closest('[data-edit]'); if(edK&&!e.target.closest('a')&&!e.target.closest('button')){ const c=getDest(ui.openDest); const key=edK.dataset.edit; const it=c&&c[key].find(x=>x.id===edK.dataset.id); if(it) openForm(key,it,{destId:c.id,key}); return; }
@@ -697,13 +638,14 @@ function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 function yen(n){ return Math.round(n).toLocaleString('ja-JP'); }
 function daysUntil(d){ const x=new Date(d+'T00:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.round((x-n)/86400000); }
 function daysBetween(a,b){ return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000); }
-function addDays(d,n){ const x=new Date(d+'T00:00:00');x.setDate(x.getDate()+n);return x.toISOString().slice(0,10); }
+function addDays(d,n){ const x=new Date(d+'T00:00:00');x.setDate(x.getDate()+n);
+  return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`; }
 function fmtDay(d){ const dt=new Date(d+'T00:00:00');const w=['日','月','火','水','木','金','土'][dt.getDay()];return `${dt.getMonth()+1}月${dt.getDate()}日（${w}）`; }
 function fmtRangeLong(s,e){ if(!s)return''; const a=new Date(s+'T00:00:00'); if(!e||e===s) return `${a.getFullYear()}.${a.getMonth()+1}.${a.getDate()}`;
   const b=new Date(e+'T00:00:00'); return `${a.getFullYear()}.${a.getMonth()+1}.${a.getDate()} – ${b.getMonth()+1}.${b.getDate()}`; }
 function fmtDateTime(dt){ try{ const d=new Date(dt);const w=['日','月','火','水','木','金','土'][d.getDay()];return `${d.getMonth()+1}/${d.getDate()}（${w}）${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }catch(e){ return dt; } }
 
-render(); initSync();
+render(); initSync(); checkImportHash();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>

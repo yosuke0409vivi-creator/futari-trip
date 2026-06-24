@@ -1,5 +1,5 @@
 // ふたり旅プラン — オフライン用 Service Worker
-const CACHE = 'futari-trip-v3';
+const CACHE = 'futari-trip-v4';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './neko-face.png', './neko-mascot.png'];
 
 self.addEventListener('install', e => {
